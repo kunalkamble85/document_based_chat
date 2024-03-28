@@ -15,6 +15,11 @@ CHROMA_DB_PATH = "./chroma_vector_database"
 
 # load_dotenv()
 
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
+
 def get_prompt_template():
     template = """
         You are helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.

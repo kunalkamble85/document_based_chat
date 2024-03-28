@@ -1,7 +1,8 @@
 streamlit
 langchain
 langchain-community
-chromadb==0.3.29
+chromadb
 pypdf
 sentence-transformers
 google-generativeai
+pysqlite3-binary
