@@ -8,11 +8,11 @@ from langchain.chains import RetrievalQA
 from langchain_community.chat_models import ChatGooglePalm
 from htmlTemplates import css
 from PIL import Image
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 CHROMA_DB_PATH = "./chroma_vector_database"
 
-load_dotenv()
+# load_dotenv()
 
 def get_conversation_chain():
     # for RetrievalQA
