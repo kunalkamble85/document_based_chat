@@ -5,4 +5,8 @@ chromadb
 pypdf
 sentence-transformers
 google-generativeai
+langchain_google_genai
+docx2txt
+unstructured
+openpyxl
 pysqlite3-binary
