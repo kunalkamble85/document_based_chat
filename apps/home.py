@@ -153,7 +153,7 @@ def enabled():
     st.session_state.disabled = False
 
     
-st.title("Q&A using documents")
+st.title("🤖 Q&A using documents")
 query = st.chat_input("Enter question here:", disabled=st.session_state.disabled)
 
 with st.sidebar:
