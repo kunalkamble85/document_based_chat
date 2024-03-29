@@ -6,6 +6,7 @@ from langchain_community.document_loaders import PyPDFLoader, TextLoader, Docx2t
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain_google_genai import GoogleGenerativeAI
+from langchain.chat_models import ChatGooglePalm
 from htmlTemplates import css
 from PIL import Image
 # from dotenv import load_dotenv
@@ -34,7 +35,8 @@ def get_prompt_template():
         Chat History:
         {chat_history}
 
-        Context: {context}
+        Context: 
+        {context}
 
         Follow Up Input: {question}
         Standalone question or instruction:
@@ -45,8 +47,8 @@ def get_prompt_template():
 
 def get_conversation_chain(vector_store):
     # for RetrievalQA
-    # llm = ChatGooglePalm(temprature = 0.1, model_kwargs={"max_length": 200})
-    llm = GoogleGenerativeAI(model="gemini-pro", temprature=0.1, model_kwargs={"max_length": 200})
+    llm = ChatGooglePalm(temprature = 0.5, model_kwargs={"max_length": 200})
+    # llm = GoogleGenerativeAI(model="gemini-pro", temprature=0.5, model_kwargs={"max_length": 200})
 
     # memory = ConversationBufferMemory(memory_key="chat_history", output_key='result', return_messages = True,
     #                                   return_source_documents=True)
@@ -63,8 +65,8 @@ def get_conversation_chain(vector_store):
                                                  memory = memory, 
                                                  chain_type = "stuff",
                                                  verbose= True, 
-                                                 return_source_documents=True,
-                                                 combine_docs_chain_kwargs={"prompt": get_prompt_template()})
+                                                 return_source_documents=True)
+                                                #  combine_docs_chain_kwargs={"prompt": get_prompt_template()})
 
 
 
@@ -147,10 +149,6 @@ if "chat_history" in st.session_state:
 if "disabled" not in st.session_state:
     st.session_state.disabled = True
 
-
-def disabled():
-    st.session_state.disabled = True
-
 def enabled():
     st.session_state.disabled = False
 
@@ -168,7 +166,7 @@ with st.sidebar:
                 print(documents)
                 store_documents_in_database(documents)
                 st.success('Document processed!')
-                st.session_state.chat_history=None
+                # st.session_state.chat_history=None
 
 
 if query:
