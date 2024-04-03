@@ -9,39 +9,17 @@ from langchain_google_genai import GoogleGenerativeAI
 from langchain_community.chat_models import ChatGooglePalm
 from htmlTemplates import css
 from PIL import Image
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 from langchain_core.prompts import (PromptTemplate)
 import traceback
-import tempfile
-import os
+from utils.langchain_utils import store_documents_in_database
 
-CHROMA_DB_PATH = "./chroma_vector_database"
-
-# load_dotenv()
+load_dotenv()
 
 
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
-
-
-def get_prompt_template():
-    template = """
-        You are helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.
-        Use the given Context and History enclosed with backticks to answer the question at the end.
-        Don't try to make up an answer, if you don't know, just say that you don't know.
-
-        Chat History:
-        {chat_history}
-
-        Context: 
-        {context}
-
-        Follow Up Input: {question}
-        Standalone question or instruction:
-        """
-    return PromptTemplate(template=template, input_variables=["chat_history", "context", "question"])
+# __import__('pysqlite3')
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 
 
@@ -71,46 +49,6 @@ def get_conversation_chain():
                                                     #  combine_docs_chain_kwargs={"prompt": get_prompt_template()})
         st.session_state.conversation_chain = qa_chain
     return st.session_state.conversation_chain
-
-
-def store_documents_in_database(docs):
-    text = []
-    for file in docs:
-        try:
-            file_extension = os.path.splitext(file.name)[1]
-            print(file_extension)
-            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                temp_file.write(file.read())
-                temp_file_path = temp_file.name
-
-            if file_extension == ".pdf":
-                loader = PyPDFLoader(temp_file_path)
-            elif file_extension == ".csv":
-                loader = CSVLoader(temp_file_path)
-            elif file_extension == ".txt":
-                loader = TextLoader(temp_file_path)
-            elif file_extension == ".doc" or file_extension == ".docx":
-                loader = Docx2txtLoader(temp_file_path)
-            elif file_extension == ".xls" or file_extension == ".xlsx":
-                loader = UnstructuredExcelLoader(temp_file_path)
-            if loader:
-                text.extend(loader.load())
-                os.remove(temp_file_path)
-            print(f"Saved file to vector database: {file}")
-        except:
-            print(traceback.format_exc())
-            print(f"Error while loading file: {file}")
-
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100, separators=["\n"], length_function=len)
-        chunks = text_splitter.split_documents(text)
-        # to use own embedding
-        # embeddings = HuggingFaceEmbeddings(model_name='google/flan-t5-xxl',model_kwargs={'device': 'cpu'})
-        # db = st.session_state.vectordb.from_texts(texts = chunks)
-        if "vector_store" not in st.session_state:
-            vector_store = Chroma.from_documents(documents = chunks, embedding=embedding_function)
-        else:
-            vector_store = st.session_state.vector_store.from_documents(documents = chunks, embedding=embedding_function)
-        st.session_state.vector_store = vector_store
 
 
 def handle_user_questions(query):
@@ -152,7 +90,6 @@ if "disabled" not in st.session_state:
 def enabled():
     st.session_state.disabled = False
 
-    
 st.title("🤖 Q&A using documents")
 query = st.chat_input("Enter question here:", disabled=st.session_state.disabled)
 
@@ -167,7 +104,7 @@ with st.sidebar:
         with st.spinner('Processing...'):
             if documents:
                 print(documents)
-                store_documents_in_database(documents)
+                st.session_state.vector_store = store_documents_in_database(documents)
                 st.success('Document processed!')
 
 
@@ -175,4 +112,3 @@ with st.sidebar:
 if query:
     with st.spinner('Thinking...'):
         handle_user_questions(query)
-

@@ -1,6 +1,8 @@
 streamlit
 langchain
 langchain-community
+langchain_experimental
+langchain-openai
 chromadb
 pypdf
 sentence-transformers
@@ -9,4 +11,5 @@ langchain_google_genai
 docx2txt
 unstructured
 openpyxl
+sdv
 pysqlite3-binary
