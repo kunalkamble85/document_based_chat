@@ -3,7 +3,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores.chroma import Chroma
 from langchain_community.document_loaders import PyPDFLoader, TextLoader, Docx2txtLoader, CSVLoader, UnstructuredExcelLoader
 from langchain_community.chat_models import ChatGooglePalm
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import traceback
 import tempfile
 import os
@@ -13,13 +13,11 @@ from sdv.lite import SingleTablePreset
 import pandas as pd
 
 
-load_dotenv()
+# load_dotenv()
 
-# CHROMA_DB_PATH = "./chroma_vector_database"
-# __import__('pysqlite3')
-# import sys
-# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 
 def get_prompt_template():
