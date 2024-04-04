@@ -9,6 +9,9 @@ from langchain_core.prompts import (PromptTemplate)
 from sdv.metadata import SingleTableMetadata
 from sdv.lite import SingleTablePreset
 import pandas as pd
+import streamlit as st
+from langchain.chains import ConversationChain
+from langchain_community.chat_models import ChatGooglePalm
 
 def get_prompt_template():
     template = """
@@ -52,10 +55,8 @@ def get_test_case_for_use_case(user_input):
         """
     return template
 
-
-
-def clear_vecotrdb(embedding_function):
-    vector_store = Chroma(embedding_function = embedding_function)
+def clear_vectordb(embedding_function):
+    vector_store = Chroma(persist_directory=st.session_state.CHROMA_DB_PATH, embedding_function = embedding_function)
     for collection in vector_store._client.list_collections():
         ids = collection.get()['ids']
         print('REMOVE %s document(s) from %s collection' % (str(len(ids)), collection.name))
@@ -122,7 +123,7 @@ def store_documents_in_database(docs):
         # db = st.session_state.vectordb.from_texts(texts = chunks)
         # clear_vecotrdb(embedding_function)
         embedding_function = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-        return Chroma.from_documents(documents = chunks, embedding=embedding_function)
+        st.session_state.vector_store = Chroma.from_documents(persist_directory=st.session_state.CHROMA_DB_PATH, documents = chunks, embedding=embedding_function)
 
 import requests
 
@@ -135,15 +136,33 @@ def get_test_cases(input, option):
     else:
         prompt = get_test_case_for_use_case(input)
     
+    print(prompt)
+    
     payload = {
                 "inputs": prompt,
                 "parameters": {"temperature": 0.8}
             }
     response = requests.post(API_URL, headers=headers, json=payload)
     output = response.json()   
+    print("---------------------------------------------------")
+    print(output)
+    print("---------------------------------------------------")
     text = output[0]["generated_text"]
     if "```" in text:
         return "\t" + text.split("```")[-1].strip()
     elif "[/INST]" in text:
         return "\t" + text.split("[/INST]")[-1].strip()
     return text
+
+def generate_tests_using_google(input, option):
+    if option == "Code":
+        prompt = get_test_case_for_code(input)
+    else:
+        prompt = get_test_case_for_use_case(input)
+    llm = ChatGooglePalm(temprature = 0.5, model_kwargs={"max_length": 200})
+    qa_chain = ConversationChain(llm=llm)
+    output = qa_chain.invoke(prompt)
+    print(output)
+    if "response" in output:
+        return output["response"]
+    return "Not able to fetch test cases."

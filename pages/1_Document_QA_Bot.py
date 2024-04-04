@@ -7,7 +7,10 @@ from htmlTemplates import css
 from PIL import Image
 import traceback
 from utils.langchain_utils import store_documents_in_database
-
+from utils.langchain_utils import clear_vectordb
+from langchain_community.vectorstores.chroma import Chroma
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages.ai import AIMessage
 
 def get_conversation_chain():
     # for RetrievalQA
@@ -48,11 +51,12 @@ def handle_user_questions(query):
         output = None
         print("Error while getting response")
 
-    if output:
-        st.session_state.chat_history=output["chat_history"]
-        
-        print(st.session_state.chat_history)
+    if "chat_history" in st.session_state or output:
+        if output:
+            st.session_state.chat_history=output["chat_history"]
+        # print(st.session_state.chat_history)
         for i, message in enumerate(st.session_state.chat_history):
+            # print(type(message))
             if i%2 == 0:
                 # st.write(user_template.replace("{{MSG}}",message.content), unsafe_allow_html=True)
                 st.chat_message("user", avatar=Image.open('./images/chat_user.jpeg')).write(message.content)
@@ -60,41 +64,49 @@ def handle_user_questions(query):
                 # st.write(bot_template.replace("{{MSG}}",message.content), unsafe_allow_html=True)
                 st.chat_message("assistant", avatar=Image.open('./images/ai_robot.jpg')).write(message.content)
                 # st.chat_message("user", avatar="🤖").write(message.content)
-    else:
+
+    if not output:
+        st.session_state.chat_history.append(HumanMessage(content = query))
+        st.session_state.chat_history.append(AIMessage(content = "I don't know the answer."))
         st.chat_message("user", avatar=Image.open('./images/chat_user.jpeg')).write(query)
         st.chat_message("assistant", avatar=Image.open('./images/ai_robot.jpg')).write("I don't know the answer.")
 
 
-st.set_page_config(page_title="Q and A using Documents", page_icon=":book:")
-st.write(css, unsafe_allow_html= True)
-embedding_function = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+if "CHROMA_DB_PATH" not in st.session_state:
+    st.error("Please enter your user id in home page.")
+else:
+    st.set_page_config(page_title="Q and A using Documents", page_icon=":book:")
+    st.write(css, unsafe_allow_html= True)
+    embedding_function = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-if "chat_history" not in st.session_state: 
-    st.session_state["chat_history"] = []
-if "disabled" not in st.session_state:
-    st.session_state.disabled = True
-def enabled():
-    st.session_state.disabled = False
+    if "chat_history" not in st.session_state: 
+        st.session_state["chat_history"] = []
+    if "disabled" not in st.session_state:
+        st.session_state.disabled = True
+    if "vector_store" not in st.session_state:
+        with st.spinner('Initializing database...'):
+            st.session_state.vector_store = Chroma(persist_directory=st.session_state.CHROMA_DB_PATH, embedding_function=embedding_function)
+    if "delete_history" in st.session_state:
+        clear_vectordb(embedding_function)
+        
+    def enabled():
+        st.session_state.disabled = False
 
-st.title("🤖 Q&A using documents")
-query = st.chat_input("Enter question here:", disabled=st.session_state.disabled)
+    st.title("🤖 Q&A using documents")
+    query = st.chat_input("Enter question here:")
 
-with st.sidebar:
-    st.title("Upload your documents..")
-    documents = st.file_uploader(label="Choose a file", accept_multiple_files=True)
-    button = st.button(label="Process", on_click = enabled)
-    if button:
-        if "chat_history" in st.session_state: st.session_state["chat_history"] = []
-        if "conversation_chain" in st.session_state: del st.session_state["conversation_chain"]
-        if "vector_store" in st.session_state: del st.session_state["vector_store"]
-        with st.spinner('Processing...'):
-            if documents:
-                print(documents)
-                st.session_state.vector_store = store_documents_in_database(documents)
-                st.success('Document processed!')
+    with st.sidebar:
+        st.title("Upload your documents..")
+        documents = st.file_uploader(label="Choose a file", accept_multiple_files=True)
+        button = st.button(label="Process")
+        if button:
+            with st.spinner('Processing...'):
+                if documents:
+                    print(documents)
+                    store_documents_in_database(documents)
+                    st.success('Document processed!')
 
 
-
-if query:
-    with st.spinner('Thinking...'):
-        handle_user_questions(query)
+    if query:
+        with st.spinner('Thinking...'):
+            handle_user_questions(query)
