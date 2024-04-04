@@ -1,21 +1,10 @@
 import streamlit as st
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationChain
-from langchain_google_genai import GoogleGenerativeAI
 from langchain_community.chat_models import ChatGooglePalm
 from htmlTemplates import css
 from PIL import Image
-from dotenv import load_dotenv
 import traceback
-
-
-load_dotenv()
-
-
-# __import__('pysqlite3')
-# import sys
-# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
 
 
 def get_conversation_chain():
