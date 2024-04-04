@@ -137,7 +137,7 @@ def get_test_cases(input, option):
     
     payload = {
                 "inputs": prompt,
-                "parameters": {"temperature": 0.8, "max_token": 4048}
+                "parameters": {"temperature": 0.8}
             }
     response = requests.post(API_URL, headers=headers, json=payload)
     output = response.json()   

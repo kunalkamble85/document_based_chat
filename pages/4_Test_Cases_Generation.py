@@ -10,7 +10,14 @@ def convert_df(df):
 
 
 option = st.selectbox("How would you like to generate test cases?", ("", "Code", "Business Use Case"))
-user_input = st.text_area("Insert your code or use Case")
-if option != "" and user_input !="":
-    output = get_test_cases(user_input, option)
-    st.download_button('Download test cases', output)
+documents = st.file_uploader(label="Choose a BRD file", type=["doc","txt"])
+user_input = st.text_area("or Insert your code or use Case", height= 400)
+
+if option != "" and (user_input !="" or documents):
+   if documents:
+      user_input = documents.read()
+      output = get_test_cases(user_input, option)
+   else:
+      output = get_test_cases(user_input, option)
+   
+   st.download_button('Download test cases', output)
