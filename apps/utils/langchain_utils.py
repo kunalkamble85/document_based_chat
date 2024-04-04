@@ -2,8 +2,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores.chroma import Chroma
 from langchain_community.document_loaders import PyPDFLoader, TextLoader, Docx2txtLoader, CSVLoader, UnstructuredExcelLoader
-from langchain_community.chat_models import ChatGooglePalm
-# from dotenv import load_dotenv
 import traceback
 import tempfile
 import os
@@ -11,14 +9,6 @@ from langchain_core.prompts import (PromptTemplate)
 from sdv.metadata import SingleTableMetadata
 from sdv.lite import SingleTablePreset
 import pandas as pd
-
-
-# load_dotenv()
-
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
 
 def get_prompt_template():
     template = """
@@ -36,6 +26,31 @@ def get_prompt_template():
         Standalone question or instruction:
         """
     return PromptTemplate(template=template, input_variables=["chat_history", "context", "question"])
+
+
+def get_test_case_for_code(user_input):
+    template = f"""
+        <s>[INST]
+        You are an expert programmer and you know how to write test cases in any programming languages. 
+        In user_input, I would be providing you the source code function. 
+        Analyze the source code and generate test cases in same programming language.  
+        Do not include my question in your answer.
+        {user_input}
+        [/INST]
+        """
+    return template
+
+def get_test_case_for_use_case(user_input):
+    template = f"""
+        <s>[INST]
+        You are an expert programmer and you know how to write test cases in any programming languages. 
+        In user_input, I would be providing you the business use case. 
+        Understand the context of use case and generate higher level test cases.  
+        Do not include my question in your answer.
+        {user_input}
+        [/INST]
+        """
+    return template
 
 
 
@@ -108,3 +123,27 @@ def store_documents_in_database(docs):
         # clear_vecotrdb(embedding_function)
         embedding_function = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
         return Chroma.from_documents(documents = chunks, embedding=embedding_function)
+
+import requests
+
+def get_test_cases(input, option):
+    API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+    headers = {"Authorization": f"Bearer {os.getenv('HUGGINGFACEHUB_API_TOKEN')}"}
+
+    if option == "Code":
+        prompt = get_test_case_for_code(input)
+    else:
+        prompt = get_test_case_for_use_case(input)
+    
+    payload = {
+                "inputs": prompt,
+                "parameters": {"temperature": 0.8, "max_token": 4048}
+            }
+    response = requests.post(API_URL, headers=headers, json=payload)
+    output = response.json()   
+    text = output[0]["generated_text"]
+    if "```" in text:
+        return "\t" + text.split("```")[-1].strip()
+    elif "[/INST]" in text:
+        return "\t" + text.split("[/INST]")[-1].strip()
+    return text
