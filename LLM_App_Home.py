@@ -17,4 +17,6 @@ if button:
     elif "delete_history" in st.session_state: del st.session_state["delete_history"]
     st.session_state.CHROMA_DB_PATH = f"./chroma_vector_database/{userid}"
     print(st.session_state.CHROMA_DB_PATH)
+    st.session_state.KUZU_DB_PATH = f"./kuzu_database/{userid}"
+    print(st.session_state.KUZU_DB_PATH)
     st.success("Session created successfully, please click on application from left menu.")

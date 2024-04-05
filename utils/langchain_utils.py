@@ -12,6 +12,7 @@ import pandas as pd
 import streamlit as st
 from langchain.chains import ConversationChain
 from langchain_community.chat_models import ChatGooglePalm
+import kuzu
 
 def get_prompt_template():
     template = """
@@ -166,3 +167,22 @@ def generate_tests_using_google(input, option):
     if "response" in output:
         return output["response"]
     return "Not able to fetch test cases."
+
+
+def insert_graph_entries(lines):
+    conn = kuzu.Connection(st.session_state.kuzu_database)
+    for sql in lines:
+        try:
+            print(f"Executing:{sql}")
+            conn.execute(sql)
+        except:
+            print(f"error executing:{sql}")
+
+
+def create_graph_in_database(file):
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        temp_file.write(file.read())
+        temp_file_path = temp_file.name
+    with open(temp_file_path) as file:
+        lines = file.readlines()
+        insert_graph_entries(lines)

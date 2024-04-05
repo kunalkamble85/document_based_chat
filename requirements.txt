@@ -12,4 +12,5 @@ docx2txt
 unstructured
 openpyxl
 sdv
+kuzu
 pysqlite3-binary
