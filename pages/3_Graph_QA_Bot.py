@@ -62,7 +62,10 @@ else:
     with st.sidebar:
         st.title("Upload your documents..")
         documents = st.file_uploader(label="Choose a relationship file", accept_multiple_files=False, type =["txt"])
+        sample_data = open("./sample_data/graph_data_sample.txt").read()
+        st.download_button('Download sample file', sample_data, "graph_data_sample.txt")
         button = st.button(label="Process")
+        
         if button:
             with st.spinner('Processing...'):
                 if documents:

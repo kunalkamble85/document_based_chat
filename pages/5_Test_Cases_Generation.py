@@ -21,4 +21,4 @@ if button:
          # output = get_test_cases(user_input, option)
          output = generate_tests_using_google(user_input, option)
          st.write("Click below button to download test cases generated.")
-         st.download_button('Download test cases', output)
+         st.download_button('Download test cases', output, "test_cases.txt")
