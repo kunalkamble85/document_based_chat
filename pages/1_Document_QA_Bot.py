@@ -3,6 +3,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain_community.chat_models import ChatGooglePalm
+from langchain_google_genai import ChatGoogleGenerativeAI
 from htmlTemplates import css
 from PIL import Image
 import traceback
@@ -12,11 +13,14 @@ from langchain_community.vectorstores.chroma import Chroma
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.ai import AIMessage
 
+st.set_page_config(page_title="Q and A using Documents", page_icon=":book:", layout="wide")
+
 def get_conversation_chain():
     # for RetrievalQA
     print(st.session_state.keys())
     if "conversation_chain" not in st.session_state:
         llm = ChatGooglePalm(temprature = 0.5, model_kwargs={"max_length": 200})
+        # llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", temprature = 0.1)
         # llm = GoogleGenerativeAI(model="gemini-pro", temprature=0.5, model_kwargs={"max_length": 200})
 
         # memory = ConversationBufferMemory(memory_key="chat_history", output_key='result', return_messages = True,
@@ -75,7 +79,6 @@ def handle_user_questions(query):
 if "CHROMA_DB_PATH" not in st.session_state:
     st.error("Please enter your user id in home page.")
 else:
-    st.set_page_config(page_title="Q and A using Documents", page_icon=":book:")
     st.write(css, unsafe_allow_html= True)
     embedding_function = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 

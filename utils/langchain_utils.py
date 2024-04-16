@@ -12,6 +12,7 @@ import pandas as pd
 import streamlit as st
 from langchain.chains import ConversationChain
 from langchain_community.chat_models import ChatGooglePalm
+from langchain_google_genai import ChatGoogleGenerativeAI
 import kuzu
 
 def get_prompt_template():
@@ -56,6 +57,42 @@ def get_test_case_for_use_case(user_input):
         """
     return template
 
+
+def get_prompt_for_code_conversion(input, source_language, target_language):
+    template = f"""
+        <s>[INST]
+        You are an expert programmer of {source_language} and {target_language} programming languages. 
+        In user_input, I would be providing you the source code. 
+        Analyze the {source_language} source code and convert the code into {target_language}.  
+        Generate proper comments for the code.
+        {input}
+        [/INST]
+        """
+    return template
+
+def get_prompt_for_code_explain(input, source_language):
+    template = f"""
+        <s>[INST]
+        You are an expert programmer of {source_language} programming language. 
+        In user_input, I would be providing you the source code. 
+        Analyze the {source_language} source code and explain the code line by line.
+        do not include code into the explaination.
+        {input}
+        [/INST]
+        """
+    return template
+
+def get_prompt_summary_task(input, max_tokens):
+    template = f"""
+        <s>[INST]
+        You are helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.
+        Use the given text below and generate the summary with {max_tokens} words.
+        {input}
+        [/INST]
+        """
+    return template
+
+
 def clear_vectordb(embedding_function):
     vector_store = Chroma(persist_directory=st.session_state.CHROMA_DB_PATH, embedding_function = embedding_function)
     for collection in vector_store._client.list_collections():
@@ -87,7 +124,29 @@ def process_documents(file, num_rows):
     print(synthetic_data.head())
     return synthetic_data
     
-
+def get_text_from_documents(file):
+    text = ""
+    try:
+        file_extension = os.path.splitext(file.name)[1]
+        print(file_extension)
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_file.write(file.read())
+            temp_file_path = temp_file.name
+        if file_extension == ".pdf":
+            loader = PyPDFLoader(temp_file_path)
+        elif file_extension == ".txt":
+            loader = TextLoader(temp_file_path)
+        elif file_extension == ".doc" or file_extension == ".docx":
+            loader = Docx2txtLoader(temp_file_path)
+        if loader:
+            for doc in loader.load():
+                text += "\n" + doc.page_content
+            os.remove(temp_file_path)
+            print(f"Got the content: {file}")
+    except:
+        print(traceback.format_exc())
+        print(f"Error while loading file: {file}")    
+    return text
 
 def store_documents_in_database(docs):
     text = []
@@ -160,13 +219,37 @@ def generate_tests_using_google(input, option):
         prompt = get_test_case_for_code(input)
     else:
         prompt = get_test_case_for_use_case(input)
-    llm = ChatGooglePalm(temprature = 0.5, model_kwargs={"max_length": 200})
+    llm = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
     qa_chain = ConversationChain(llm=llm)
     output = qa_chain.invoke(prompt)
     print(output)
     if "response" in output:
         return output["response"]
     return "Not able to fetch test cases."
+
+
+def process_source_code(input, option, source_language, target_language):
+    if option == "Convert Code":
+        prompt = get_prompt_for_code_conversion(input, source_language, target_language)
+    else:
+        prompt = get_prompt_for_code_explain(input, source_language)
+    llm = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
+    qa_chain = ConversationChain(llm=llm)
+    output = qa_chain.invoke(prompt)
+    print(output)
+    if "response" in output:
+        return output["response"]
+    return "Not able to convert/explain code."
+
+def summarize_document(text, max_tokens):
+    prompt = get_prompt_summary_task(text, max_tokens)
+    llm = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
+    qa_chain = ConversationChain(llm=llm)
+    output = qa_chain.invoke(prompt)
+    print(output)
+    if "response" in output:
+        return output["response"]
+    return "Not able to get summary."
 
 
 def insert_graph_entries(lines):

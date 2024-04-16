@@ -2,6 +2,7 @@ import streamlit as st
 from utils.langchain_utils import process_documents
 
 
+st.set_page_config(page_title="Synthetic Data Generation", page_icon=":book:", layout="wide")
 st.title("🤖 Synthetic Data Generation")
 
 @st.cache_data

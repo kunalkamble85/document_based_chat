@@ -4,6 +4,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain_community.chat_models import ChatGooglePalm
+from langchain_google_genai import ChatGoogleGenerativeAI
 from htmlTemplates import css
 from PIL import Image
 from utils.langchain_utils import store_documents_in_database, create_graph_in_database
@@ -17,8 +18,11 @@ from langchain_community.graphs import KuzuGraph
 from langchain_openai import ChatOpenAI
 import traceback
 
+st.set_page_config(page_title="Q and A using Graph Database", page_icon=":book:", layout="wide")
+
 def handle_user_questions(query):
     llm = ChatGooglePalm(temprature = 0.1)
+    # llm = ChatGoogleGenerativeAI(model="gemini-1.0-pro", temprature = 0.1)
 
     graph = KuzuGraph(st.session_state.kuzu_database)
     chain = KuzuQAChain.from_llm(llm, graph=graph, verbose=True)
@@ -52,7 +56,6 @@ def handle_user_questions(query):
 if "KUZU_DB_PATH" not in st.session_state:
     st.error("Please enter your user id in home page.")
 else:
-    st.set_page_config(page_title="Q and A using Graph Database", page_icon=":book:")
     st.write(css, unsafe_allow_html= True)
 
     if "kuzu_database" not in st.session_state:

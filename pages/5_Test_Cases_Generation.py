@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.langchain_utils import get_test_cases, generate_tests_using_google
 
-
+st.set_page_config(page_title="Test Cases Generation", page_icon=":book:", layout="wide")
 st.title("🤖 Test Cases Generation")
 
 @st.cache_data

@@ -13,4 +13,5 @@ unstructured
 openpyxl
 sdv
 kuzu
+langchain-google-genai
 pysqlite3-binary
