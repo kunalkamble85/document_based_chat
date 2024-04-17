@@ -3,7 +3,6 @@ langchain
 langchain-community
 langchain_experimental
 langchain-openai
-chromadb
 pypdf
 sentence-transformers
 google-generativeai
@@ -13,5 +12,7 @@ unstructured
 openpyxl
 sdv
 kuzu
+faiss-cpu
+python-docx
+PyMuPDF
 langchain-google-genai
-pysqlite3-binary

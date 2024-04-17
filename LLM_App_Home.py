@@ -1,9 +1,9 @@
 # from dotenv import load_dotenv
 # load_dotenv()
 
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+# __import__('pysqlite3')
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 import streamlit as st
 st.set_page_config(page_title="🤖 LLM Home", page_icon=":book:", layout="wide")
@@ -12,7 +12,6 @@ st.title("🤖 Welcome to LLM Home.")
 
 
 userid = st.text_input("Enter your user id.")
-delete_history = st.checkbox("Delete historical documents")
 cloud_provider = st.radio(
     "Choose your cloud provider",
     ["GCP", "OCP","AWS", "Azure"],
@@ -32,9 +31,7 @@ temprature = st.slider("Set the model temprature", min_value=0.0, max_value=1.0,
 
 button = st.button(label="Proceed")
 if button:
-    if delete_history: st.session_state.delete_history = True
-    elif "delete_history" in st.session_state: del st.session_state["delete_history"]
-    st.session_state.CHROMA_DB_PATH = f"./chroma_vector_database/{userid}"
+    st.session_state.CHROMA_DB_PATH = f"./vector_database/{userid}"
     print(st.session_state.CHROMA_DB_PATH)
     st.session_state.KUZU_DB_PATH = f"./kuzu_database/{userid}"
     print(st.session_state.KUZU_DB_PATH)
