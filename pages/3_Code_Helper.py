@@ -20,7 +20,7 @@ if task == "Convert Code":
 sample_data = open("./sample_data/cobol_code_sample.txt").read()
 st.download_button('Download sample file', sample_data, "cobol_code_sample.txt")
 
-how_select = st.radio("How would you like to do?", ["Piece of Code", "Upload Source File"], horizontal=True)
+how_select = st.radio("How would you like to do?", ["Upload Source File","Piece of Code", ], horizontal=True)
 
 if how_select == "Piece of Code":
     code_text = st.text_area("Insert your code", height= 200)
@@ -41,6 +41,9 @@ if button:
         output = process_source_code(code, task, source_lang, target_lang)
         st.write("Click below button to download test cases generated.")
         print(f"file_name:{file_name}")
-        target_file_name = f"{file_name.split('.')[0]}{languages_extensions.get(target_lang)}"
+        if target_lang is None:
+            target_file_name = "code_documentation.txt"
+        else:
+            target_file_name = f"{file_name.split('.')[0]}{languages_extensions.get(target_lang)}"
         st.download_button('Download output', output, target_file_name)
         st.success('Successfully processed!')

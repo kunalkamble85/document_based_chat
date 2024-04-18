@@ -10,6 +10,7 @@ st.set_page_config(page_title="🤖 LLM Home", page_icon=":book:", layout="wide"
 
 st.title("🤖 Welcome to LLM Home.")
 
+cloud_models = {"GCP":["Google Palm", 'Gemini Pro'],"OCP":["Cohore"],"AWS":['Claude Sonnet'],"Azure":['GPT-4.0']}
 
 userid = st.text_input("Enter your user id.")
 cloud_provider = st.radio(
@@ -18,8 +19,7 @@ cloud_provider = st.radio(
     captions = ["Google Cloud Provider", "Oracle Cloud Provider", "Amazon Web Services", "Azure Cloud Provder"], horizontal=True)
 
 model_name = st.radio(
-    "Select LLM Model",
-    ['Gemini Pro', "Google Palm", "Mistral","llama", "Cohore", 'Claude Sonnet', 'ChatGPT'], horizontal=True)
+    "Select LLM Model", cloud_models.get(cloud_provider), horizontal=True)
 
 # model_name = st.selectbox(
 #     'Select LLM Model',

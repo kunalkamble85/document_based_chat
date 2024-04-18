@@ -130,6 +130,8 @@ def get_text_from_documents(file):
             loader = TextLoader(temp_file_path)
         elif file_extension == ".doc" or file_extension == ".docx":
             loader = Docx2txtLoader(temp_file_path)
+        else:
+            loader = TextLoader(temp_file_path)
         if loader:
             for doc in loader.load():
                 text += "\n" + doc.page_content
@@ -194,7 +196,9 @@ def process_source_code(input, option, source_language, target_language):
     print(output)
     if "response" in output:
         response = output["response"]
-        response = response.replace(target_language,"").replace("```","")           
+        response = response.replace("```","") 
+        if target_language is not None:
+            response = response.replace(target_language,"")
         return response
     return "Not able to convert/explain code."
 

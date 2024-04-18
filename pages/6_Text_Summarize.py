@@ -5,7 +5,7 @@ from utils.langchain_utils import get_text_from_documents, summarize_document
 st.set_page_config(page_title="🤖 Text Summarize", page_icon=":book:", layout="wide")
 st.title("🤖 Text Summarize")
 
-how_select = st.radio("How would you like provide your text?", ["Enter Text", "Upload File"], horizontal=True)
+how_select = st.radio("How would you like provide your text?", ["Upload File", "Enter Text"], horizontal=True)
 
 max_tokens = st.slider("Number of words", min_value=100, max_value=4000, value=200, step=100)
 

@@ -4,6 +4,7 @@ from langchain_community.chat_models import ChatGooglePalm
 from langchain_google_genai import ChatGoogleGenerativeAI
 from PIL import Image
 from utils.file_reader import *
+from utils.langchain_utils import get_text_from_documents
 from langchain.prompts import PromptTemplate
 from langchain.chains.question_answering import load_qa_chain
 from langchain_community.vectorstores.faiss import DistanceStrategy
@@ -183,21 +184,33 @@ if task == "Upload File":
         if st.button("Upload"):
             with st.spinner("Processing documents"):
                 for uploaded_file in user_uploads:
-                    file_name = uploaded_file.name
-                    if uploaded_file.type == "application/pdf":
-                        raw_text = get_text_from_pdf(uploaded_file)
-                    elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                        raw_text = get_text_from_docx(uploaded_file)
-                    elif uploaded_file.type == "text/plain":
-                        raw_text = get_text_from_txt(uploaded_file)
-                    elif uploaded_file.type == "text/csv":
-                        raw_text = get_text_from_csv(uploaded_file)
-                    elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-                        raw_text = get_text_from_xlsx(uploaded_file)
-                    
-                    update_vector_store(file_name, raw_text)
-                    st.session_state.documents_processed = True
-                    st.info(f"File {file_name} uploaded successfully.")
+                    try:
+                        file_name = uploaded_file.name
+                        if uploaded_file.type == "application/pdf":
+                            raw_text = get_text_from_pdf(uploaded_file)
+                        elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                            raw_text = get_text_from_docx(uploaded_file)
+                        elif uploaded_file.type == "text/plain":
+                            raw_text = get_text_from_txt(uploaded_file)
+                        elif uploaded_file.type == "text/csv":
+                            raw_text = get_text_from_csv(uploaded_file)
+                        elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                            raw_text = get_text_from_xlsx(uploaded_file)
+                        else:
+                            raw_text = get_text_from_txt(uploaded_file)                                                    
+                        update_vector_store(file_name, raw_text)
+                        st.session_state.documents_processed = True
+                        st.info(f"File {file_name} uploaded successfully.")
+                    except Exception as e:
+                        try:
+                            #try using other method to get text
+                            raw_text = get_text_from_documents(uploaded_file)
+                            update_vector_store(file_name, raw_text)
+                            st.session_state.documents_processed = True
+                            st.info(f"File {file_name} uploaded successfully.")
+                        except Exception as e:
+                            print(e)
+                            st.error(f"Error while loading file {file_name}.")
 if task == "Delete File":
     fileslist = get_all_filenames_from_vector_store()
     if len(fileslist):

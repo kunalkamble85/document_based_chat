@@ -24,10 +24,10 @@ def handle_user_questions(query):
         print("error while executing graph query.")
     print(output)
     if output:
-        if "history" in output:
-            history = output["history"].split("\n")
-            if output["history"] !="":
-                for i, message in enumerate(history):
+        if "graph_history" in output:
+            graph_history = output["graph_history"].split("\n")
+            if output["graph_history"] !="":
+                for i, message in enumerate(graph_history):
                     if i%2 == 0:
                         # st.write(user_template.replace("{{MSG}}",message.content), unsafe_allow_html=True)
                         st.chat_message("user", avatar=Image.open('./images/chat_user.jpeg')).write(message)

@@ -9,12 +9,13 @@ st.title("🤖 Synthetic Data Generation")
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
-
+sample_data = open("./sample_data/synthetic_data_sample.csv").read()
+st.sidebar.download_button('Download sample file', sample_data, "synthetic_data_sample.csv", "text/csv")
 
 num_rows = st.sidebar.slider("Selet output data size", min_value=1000, max_value=200000, value=5000, step=1000)
 documents = st.file_uploader(label="Upload your sample data for model to learn.", type="csv")
-sample_data = open("./sample_data/synthetic_data_sample.csv").read()
-st.download_button('Download sample file', sample_data, "synthetic_data_sample.csv", "text/csv")
+
+
 
 if documents:
     with st.spinner('Processing...'):
