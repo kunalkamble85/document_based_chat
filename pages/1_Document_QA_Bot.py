@@ -1,6 +1,7 @@
 import streamlit as st
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.chat_models import ChatGooglePalm
+from langchain_google_genai import ChatGoogleGenerativeAI
 from PIL import Image
 from utils.file_reader import *
 from langchain.prompts import PromptTemplate
@@ -31,12 +32,13 @@ def get_conversation_chain():
     question:\{question}\nText:{context}
     """
     model = ChatGooglePalm(temprature = 0.1, model_kwargs={"max_length": 200})
+    # model = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
     prompt = PromptTemplate(template=prompt_template, input_variables=["context","question"])
     chain = load_qa_chain(model, chain_type="stuff",prompt=prompt)
     return chain
 # print(os.name)
 if os.name == "nt":
-    DATA_DIR = "C:\\kunal\\work\\repo\\document_based_chat\\data\\kunalkamble85"
+    DATA_DIR = "C:\\kunal\\work\\repo\\document_based_chat\\vector_database\\kunalkamble85"
 else:
     DATA_DIR = st.session_state.CHROMA_DB_PATH
 

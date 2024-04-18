@@ -1,5 +1,4 @@
 import streamlit as st
-from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationChain
 from langchain_community.chat_models import ChatGooglePalm
 from PIL import Image
@@ -7,20 +6,11 @@ from PIL import Image
 st.set_page_config(page_title="Chat with AI", page_icon=":book:", layout="wide")
 st.title("🤖 Chat with AI")
 
-def get_conversation_chain():
-    # for RetrievalQA
-    print(st.session_state.keys())
-    if "QA_conversation_chain" not in st.session_state:
-        llm = ChatGooglePalm(temprature = 0.5, model_kwargs={"max_length": 200})
-        memory = ConversationBufferMemory()
-        qa_chain = ConversationChain(llm=llm, memory = memory)
-        st.session_state.QA_conversation_chain = qa_chain
-    return st.session_state.QA_conversation_chain
 
 def user_input(user_question):
-    output = get_conversation_chain().invoke(user_question)
-    print(output)
-    return output["response"]
+    llm = ChatGooglePalm(temprature = 0.5, model_kwargs={"max_length": 200})
+    output = llm.invoke(user_question)
+    return output.content
 
 if "chat_messages" not in st.session_state:
     st.session_state["chat_messages"] = [{"role":"assistant" , "content":"Ask your question"}]

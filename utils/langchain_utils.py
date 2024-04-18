@@ -63,7 +63,8 @@ def get_prompt_for_code_conversion(input, source_language, target_language):
         You are an expert programmer of {source_language} and {target_language} programming languages. 
         In user_input, I would be providing you the source code. 
         Analyze the {source_language} source code and convert the code into {target_language}.  
-        Generate proper comments for the code.
+        Generate proper comments for the code. 
+        Generate the unit test cases for the code generated.
         {input}
         [/INST]
         """
@@ -90,14 +91,6 @@ def get_prompt_summary_task(input, max_tokens):
         [/INST]
         """
     return template
-
-
-def clear_vectordb(embedding_function):
-    vector_store = Chroma(persist_directory=st.session_state.CHROMA_DB_PATH, embedding_function = embedding_function)
-    for collection in vector_store._client.list_collections():
-        ids = collection.get()['ids']
-        print('REMOVE %s document(s) from %s collection' % (str(len(ids)), collection.name))
-        if len(ids): collection.delete(ids)
 
 def process_documents(file, num_rows):
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
@@ -146,43 +139,6 @@ def get_text_from_documents(file):
         print(traceback.format_exc())
         print(f"Error while loading file: {file}")    
     return text
-
-def store_documents_in_database(docs):
-    text = []
-    for file in docs:
-        try:
-            file_extension = os.path.splitext(file.name)[1]
-            print(file_extension)
-            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                temp_file.write(file.read())
-                temp_file_path = temp_file.name
-
-            if file_extension == ".pdf":
-                loader = PyPDFLoader(temp_file_path)
-            elif file_extension == ".csv":
-                loader = CSVLoader(temp_file_path)
-            elif file_extension == ".txt":
-                loader = TextLoader(temp_file_path)
-            elif file_extension == ".doc" or file_extension == ".docx":
-                loader = Docx2txtLoader(temp_file_path)
-            elif file_extension == ".xls" or file_extension == ".xlsx":
-                loader = UnstructuredExcelLoader(temp_file_path)
-            if loader:
-                text.extend(loader.load())
-                os.remove(temp_file_path)
-            print(f"Saved file to vector database: {file}")
-        except:
-            print(traceback.format_exc())
-            print(f"Error while loading file: {file}")
-
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100, separators=["\n"], length_function=len)
-        chunks = text_splitter.split_documents(text)
-        # to use own embedding
-        # embeddings = HuggingFaceEmbeddings(model_name='google/flan-t5-xxl',model_kwargs={'device': 'cpu'})
-        # db = st.session_state.vectordb.from_texts(texts = chunks)
-        # clear_vecotrdb(embedding_function)
-        embedding_function = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-        st.session_state.vector_store = Chroma.from_documents(persist_directory=st.session_state.CHROMA_DB_PATH, documents = chunks, embedding=embedding_function)
 
 import requests
 
@@ -237,7 +193,9 @@ def process_source_code(input, option, source_language, target_language):
     output = qa_chain.invoke(prompt)
     print(output)
     if "response" in output:
-        return output["response"]
+        response = output["response"]
+        response = response.replace(target_language,"").replace("```","")           
+        return response
     return "Not able to convert/explain code."
 
 def summarize_document(text, max_tokens):
