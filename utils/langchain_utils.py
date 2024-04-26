@@ -70,6 +70,18 @@ def get_prompt_for_code_conversion(input, source_language, target_language):
         """
     return template
 
+def get_prompt_for_code_generation(input, source_language):
+    template = f"""
+        <s>[INST]
+        You are an expert programmer of {source_language}. 
+        Generate code in {source_language} language for below input.  
+        Generate proper comments for the code. 
+        Generate the unit test cases for the code generated.
+        {input}
+        [/INST]
+        """
+    return template
+
 def get_prompt_for_code_explain(input, source_language):
     template = f"""
         <s>[INST]
@@ -188,9 +200,12 @@ def generate_tests_using_google(input, option):
 def process_source_code(input, option, source_language, target_language):
     if option == "Convert Code":
         prompt = get_prompt_for_code_conversion(input, source_language, target_language)
-    else:
+    elif(option == "Explain Code"):
         prompt = get_prompt_for_code_explain(input, source_language)
-    llm = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
+    else:
+        prompt = get_prompt_for_code_generation(input, source_language)
+
+    llm = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.5)
     qa_chain = ConversationChain(llm=llm)
     output = qa_chain.invoke(prompt)
     print(output)
@@ -201,6 +216,7 @@ def process_source_code(input, option, source_language, target_language):
             response = response.replace(target_language,"")
         return response
     return "Not able to convert/explain code."
+
 
 def summarize_document(text, max_tokens):
     prompt = get_prompt_summary_task(text, max_tokens)

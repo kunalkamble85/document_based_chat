@@ -13,6 +13,7 @@ st.title("🤖 Welcome to LLM Home.")
 cloud_models = {"GCP":["Google Palm", 'Gemini Pro'],"OCP":["Cohore"],"AWS":['Claude Sonnet'],"Azure":['GPT-4.0']}
 
 userid = st.text_input("Enter your user id.")
+print(f"Loging sucussful:{userid}")
 cloud_provider = st.radio(
     "Choose your cloud provider",
     ["GCP", "OCP","AWS", "Azure"],
