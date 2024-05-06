@@ -1,9 +1,9 @@
 import streamlit as st
 from utils.langchain_utils import process_source_code
 
-source = {"c":"C", "cobol":"COBOL", "java":"Java","php":"PHP","python":"Python","r":"R","js":"JavaScript"}
-target = {"python":"Python","java":"Java","php":"PHP","r":"R","js":"JavaScript"}
-languages_extensions = {"java":".java","php":".php","python":".py","r":".R","js":".js", "c":".c", "cobol":".txt"}
+source = {"c":"C", "cobol":"COBOL", "java":"Java","php":"PHP","python":"Python","r":"R","js":"JavaScript","angularJS":"angularJS","reactJS":"reactJS"}
+target = {"python":"Python","java":"Java","php":"PHP","r":"R","js":"JavaScript", "reactJS":"reactJS", "angularJS":"angularJS"}
+languages_extensions = {"java":".java","php":".php","python":".py","r":".R","js":".js", "c":".c", "cobol":".txt", "reactJS":".js","angularJS":".js"}
 
 
 st.set_page_config(page_title="🤖 Code conversion/Documentation", page_icon=":book:", layout="wide")
