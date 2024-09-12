@@ -1,0 +1,153 @@
+{
+    "tables": {
+        "Benchmarks": {
+            "primary_key": "BENCHMARK_ID",
+            "columns": {
+                "BENCHMARK_ID": {
+                    "sdtype": "id"
+                },
+                "BM_NAME": {
+                    "sdtype": "categorical"
+                },
+                "BM_CODE": {
+                    "sdtype": "categorical"
+                },
+                "CURRENCY": {
+                    "sdtype": "categorical"
+                },
+                "BM_PROVIDER_ID": {
+                    "sdtype": "id"
+                }
+            }
+        },
+        
+        "Securities": {
+            "primary_key": "SECURITY_ID",
+            "columns": {
+                "SECURITY_ID": {
+                    "sdtype": "id"
+                },
+                "TICKER": {
+                    "sdtype": "id",
+                    "regex_format": "[A-Z]{5,7}$"
+                },
+                "SECURITY_NAME": {
+                    "sdtype": "company"
+                },
+                "SECTOR": {
+                    "sdtype": "categorical"
+                },
+                "INDUSTRY": {
+                    "sdtype": "categorical"
+                },
+                "MARKET_CAP_USD": {
+                    "sdtype": "numerical",
+                    "computer_representation": "Float"
+                },
+                "MATURITY_DATE": {
+                    "sdtype": "datetime",
+                    "datetime_format": "%d-%m-%Y"
+                },
+                "CURRENT_PRICE": {
+                    "sdtype": "id",
+                    "regex_format": "[1-9][0-9][0-9]\\.\\d{2}$"
+                },
+                "LISTING_EXCHANGE": {
+                    "sdtype": "categorical"
+                },
+                "COUNTRY": {
+                    "sdtype": "categorical"
+                }
+            }
+        },
+        "Portfolios": {
+            "columns": {
+                "PORTFOLIO_ID": {
+                    "sdtype": "id"
+                },
+                "TICKER": {
+                    "sdtype": "categorical"
+                   
+                },
+                "NAME": {
+                    "sdtype": "categorical"
+                    
+                },
+                "DESCRIPTION": {
+                    "sdtype": "categorical"
+                   
+                },
+                "CURRENCY": {
+                    "sdtype": "categorical"
+                },
+                "CREATION_DATE": {
+                    "sdtype": "datetime",
+                    "datetime_format": "%d-%m-%Y"
+                },
+                "MODIFIED_DATE": {
+                    "sdtype": "datetime",
+                    "datetime_format": "%d-%m-%Y"
+                }
+            },
+            "primary_key": "PORTFOLIO_ID"
+        },
+        "Holding":{
+            
+                "columns": {
+                    "PORTFOLIO_ID": {
+                        "sdtype": "id"
+                    },
+                    "BENCHMARK_ID": {
+                        "sdtype": "id"
+                    },
+                    "SECURITY_ID": {
+                        "sdtype": "id"
+                    },
+                    "PAR": {
+                        "sdtype": "id",
+                         "regex_format":"[1-9][0-9]{1,2}00"
+
+                    },
+                    "CURRENT_PRICE": {
+                        "sdtype": "id",
+                        "regex_format":"[1-9]{2,3}$"
+                    },
+                    "MARKET_VALUE": {
+                        "sdtype": "numerical"
+                    }
+                },
+                "primary_key": "PAR"
+            
+        }
+    },    
+    "relationships": [
+      
+        {
+            "parent_table_name": "Securities",
+            "child_table_name": "Holding",
+            "parent_primary_key": "SECURITY_ID",
+            "child_foreign_key": "SECURITY_ID"
+        },
+        {
+            "parent_table_name": "Benchmarks",
+            "child_table_name": "Holding",
+            "parent_primary_key": "BENCHMARK_ID",
+            "child_foreign_key": "BENCHMARK_ID"
+        },
+        {
+            "parent_table_name": "Portfolios",
+            "child_table_name": "Holding",
+            "parent_primary_key": "BENCHMARK_ID",
+            "child_foreign_key": "BENCHMARK_ID"
+        }
+
+      
+    ],
+    "constraint_class": "FixedCombinations",
+    "table_name":"Securities",
+    "constraint_parameters": {
+        "column_names": ["SECTOR", "INDUSTRY"]
+    }
+   
+    
+}

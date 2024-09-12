@@ -1,0 +1,24 @@
+{
+    "columns": {
+        "COUNTER_PARTY_ID": {
+            "sdtype": "id"
+        },
+        "NAME": {
+            "sdtype": "company"
+        },
+        "CONTACT_PERSON": {
+            "sdtype": "name"
+        },
+        "CONTACT_NUMBER": {
+            "sdtype": "id",
+            "regex_format":"[X]{6}[1-9]{4}$"
+        },
+        "EMAIL": {
+            "sdtype": "email"
+        },
+        "ADDRESS": {
+            "sdtype": "address"
+        }
+    },
+    "primary_key": "COUNTER_PARTY_ID"
+}

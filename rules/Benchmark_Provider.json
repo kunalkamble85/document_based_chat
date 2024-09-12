@@ -1,0 +1,18 @@
+ {
+    "primary_key": "BM_PROVIDER_ID",
+    "columns": {
+        "BM_PROVIDER_ID": {
+            "sdtype": "id"
+        },
+        "BM_PROVIDER": {
+            "sdtype": "categorical"
+        },
+        "SHORT_DESCRIPTION": {
+            "sdtype": "categorical"
+        },
+        "DESCRITPION": {
+            "sdtype": "categorical"
+            
+        }
+    }
+}

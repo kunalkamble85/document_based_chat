@@ -1,0 +1,28 @@
+{
+    "columns": {
+        "PORTFOLIO_ID": {
+            "sdtype": "id"
+        },
+        "TICKER": {
+            "sdtype": "categorical"
+        },
+        "NAME": {
+            "sdtype": "categorical"
+        },
+        "DESCRIPTION": {
+            "sdtype": "categorical"
+        },
+        "CURRENCY": {
+            "sdtype": "categorical"
+        },
+        "CREATION_DATE": {
+            "sdtype": "datetime",
+            "datetime_format": "%d-%m-%Y"
+        },
+        "MODIFIED_DATE": {
+            "sdtype": "datetime",
+            "datetime_format": "%d-%m-%Y"
+        }
+    },
+    "primary_key": "PORTFOLIO_ID"
+}

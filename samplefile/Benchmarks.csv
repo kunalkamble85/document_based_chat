@@ -1,0 +1,16 @@
+BENCHMARK_ID,BM_NAME,BM_CODE,CURRENCY,BM_PROVIDER_ID
+1,S&P 500 Index,SPXT, USD      ,1
+2,S&P 500 Growth Index,SPTRSGX, USD      ,1
+3,S&P 500 High Dividend Index,SPXHDUT, USD      ,1
+4,S&P 500 Value Index,SPTRSVX, USD      ,1
+5,S&P SmallCap 600 Index,SPTRSMCP, USD      ,1
+6,S&P Sector-Neutral High Yield Dividend Aristocrats Index,SPSNHDUN, USD      ,1
+7,Russell 1000 Low Volatility Focused Factor Index,R1VFFTR, USD      ,3
+8,Russell 1000 Momentum Focused Factor Index,R1MFFTR, USD      ,3
+9,Russell 1000 Yield Focused Factor Index,R1YFFTR, USD      ,3
+10,S&P MidCap 400 Growth Index,SPTRMG, USD      ,1
+11,S&P MidCap 400 Value Index,SPTRMV, USD      ,1
+12,S&P 500 ESG Index,SPXESUT, USD      ,1
+14,S&P SmallCap 600 Growth Index,SPTRSG, USD      ,1
+15,S&P SmallCap 600 Value Index,SPTRSV, USD      ,1
+13,S&P 100 Index,SPXO,USD,1
