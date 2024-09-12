@@ -17,3 +17,4 @@ python-docx
 PyMuPDF
 langchain-google-genai
 streamlit-extras
+pysqlite3-binary
