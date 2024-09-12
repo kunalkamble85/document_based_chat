@@ -19,7 +19,7 @@ with st.sidebar:
             [data-testid="stSidebarNav"] {{
                 background-image: {logo};
                 background-repeat: no-repeat;
-                padding-top: 90px;
+                padding-top: 30px;
                 background-position: 20px 20px;
             }}
         </style>
