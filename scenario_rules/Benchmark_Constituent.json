@@ -1,0 +1,25 @@
+{
+    "primary_key": "BM_CONSTITUENT_ID",
+    "columns": {
+        "BM_CONSTITUENT_ID": {
+            "sdtype": "id"
+        },
+        "BENCHMARK_ID": {
+            "sdtype": "categorical"
+        },
+        "SECURITY_ID": {
+            "sdtype": "categorical"
+        },
+        "WEIGHT(%)": {
+            "computer_representation": "Float",
+            "sdtype": "numerical"
+        },
+        "MARKET_VALUE": {
+            "computer_representation": "Float",
+            "sdtype": "numerical"
+        }
+    }
+
+
+
+}

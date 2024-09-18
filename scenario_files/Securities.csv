@@ -1,0 +1,229 @@
+SECURITY_ID,TICKER,SECURITY_NAME,SECTOR,INDUSTRY,MARKET_CAP_USD,MATURITY_DATE,CURRENT_PRICE,LISTING_EXCHANGE,COUNTRY
+1,MSFT,Microsoft Corporation,Technology,Software - Infrastructure,3.09E+12,17-02-2049,416.07,NMS,United States
+2,AAPL,Apple Inc.,Technology,Consumer Electronics,2.98E+12,01-06-2052,194.35,NMS,United States
+3,NVDA,NVIDIA Corporation,Technology,Semiconductors,2.86E+12,15-04-2049,1164.37,NMS,United States
+4,GOOG,Alphabet Inc.,Communication Services,Internet Content & Information,2.16E+12,28-09-2047,175.13,NMS,United States
+5,GOOGL,Alphabet Inc.,Communication Services,Internet Content & Information,2.15E+12,10-11-2050,173.79,NMS,United States
+6,AMZN,"Amazon.com, Inc.",Consumer Cyclical,Internet Retail,1.87E+12,20-07-2048,179.34,NMS,United States
+7,META,"Meta Platforms, Inc.",Communication Services,Internet Content & Information,1.21E+12,18-03-2054,476.99,NMS,United States
+8,BRK-B,Berkshire Hathaway Inc. New,Financial Services,Insurance - Diversified,8.88E+11,05-11-2049,409.53,NYQ,United States
+9,LLY,Eli Lilly and Company,Healthcare,Drug Manufacturers - General,7.91E+11,29-01-2048,832.59,NYQ,United States
+10,AVGO,Broadcom Inc.,Technology,Semiconductors,6.17E+11,11-04-2050,1330.82,NMS,United States
+11,JPM,JP Morgan Chase & Co.,Financial Services,Banks - Diversified,5.72E+11,03-10-2045,199.16,NYQ,United States
+12,V,Visa Inc.,Financial Services,Credit Services,5.57E+11,17-02-2049,272.42,NYQ,United States
+13,TSLA,"Tesla, Inc.",Consumer Cyclical,Auto Manufacturers,5.57E+11,26-03-2051,174.77,NMS,United States
+14,WMT,Walmart Inc.,Consumer Defensive,Discount Stores,5.37E+11,22-07-2053,66.6,NYQ,United States
+15,XOM,Exxon Mobil Corporation,Energy,Oil & Gas Integrated,5.05E+11,07-08-2052,112.67,NYQ,United States
+16,UNH,UnitedHealth Group Incorporated,Healthcare,Healthcare Plans,4.65E+11,14-06-2050,505.49,NYQ,United States
+17,MA,Mastercard Incorporated,Financial Services,Credit Services,4.13E+11,20-10-2050,444.77,NYQ,United States
+18,PG,Procter & Gamble Company (The),Consumer Defensive,Household & Personal Products,3.94E+11,18-04-2048,167.01,NYQ,United States
+19,COST,Costco Wholesale Corporation,Consumer Defensive,Discount Stores,3.67E+11,30-09-2048,827.39,NMS,United States
+20,JNJ,Johnson & Johnson,Healthcare,Drug Manufacturers - General,3.56E+11,25-12-2049,147.8,NYQ,United States
+21,ORCL,Oracle Corporation,Technology,Software - Infrastructure,3.30E+11,03-02-2048,120.07,NYQ,United States
+22,MRK,"Merck & Company, Inc.",Healthcare,Drug Manufacturers - General,3.26E+11,04-05-2050,128.71,NYQ,United States
+23,HD,"Home Depot, Inc. (The)",Consumer Cyclical,Home Improvement Retail,3.26E+11,14-11-2050,328.26,NYQ,United States
+24,BAC,Bank of America Corporation,Financial Services,Banks - Diversified,3.10E+11,27-01-2049,39.68,NYQ,United States
+25,ABBV,AbbVie Inc.,Healthcare,Drug Manufacturers - General,2.86E+11,10-07-2047,162.14,NYQ,United States
+26,CVX,Chevron Corporation,Energy,Oil & Gas Integrated,2.86E+11,06-05-2052,156.13,NYQ,United States
+27,KO,Coca-Cola Company (The),Consumer Defensive,Beverages - Non-Alcoholic,2.75E+11,09-06-2050,63.94,NYQ,United States
+28,NFLX,"Netflix, Inc.",Communication Services,Entertainment,2.72E+11,22-02-2047,631.62,NMS,United States
+29,AMD,"Advanced Micro Devices, Inc.",Technology,Semiconductors,2.59E+11,31-07-2050,159.99,NMS,United States
+30,PEP,"Pepsico, Inc.",Consumer Defensive,Beverages - Non-Alcoholic,2.39E+11,02-03-2051,173.89,NMS,United States
+31,QCOM,QUALCOMM Incorporated,Technology,Semiconductors,2.28E+11,15-01-2054,204.37,NMS,United States
+32,CRM,"Salesforce, Inc.",Technology,Software - Application,2.28E+11,11-10-2049,234.86,NYQ,United States
+33,TMO,Thermo Fisher Scientific Inc,Healthcare,Diagnostics & Research,2.17E+11,27-03-2049,569.67,NYQ,United States
+34,TMUS,"T-Mobile US, Inc.",Communication Services,Telecom Services,2.08E+11,02-04-2048,177.91,NMS,United States
+35,LIN,Linde plc,Basic Materials,Specialty Chemicals,2.07E+11,23-08-2048,431.14,NMS,United States
+36,WFC,Wells Fargo & Company,Financial Services,Banks - Diversified,2.05E+11,28-06-2050,58.7,NYQ,United States
+37,ADBE,Adobe Inc.,Technology,Software - Infrastructure,2.01E+11,25-07-2050,448.37,NMS,United States
+38,DHR,Danaher Corporation,Healthcare,Diagnostics & Research,1.95E+11,19-11-2046,263.33,NYQ,United States
+39,CSCO,"Cisco Systems, Inc.",Technology,Communication Equipment,1.91E+11,28-01-2051,47.42,NMS,United States
+40,MCD,McDonald's Corporation,Consumer Cyclical,Restaurants,1.89E+11,30-03-2047,262.72,NYQ,United States
+41,DIS,Walt Disney Company (The),Communication Services,Entertainment,1.88E+11,17-05-2049,103.33,NYQ,United States
+42,ACN,Accenture plc,Technology,Information Technology Services,1.81E+11,29-04-2048,288.06,NYQ,United States
+43,ABT,Abbott Laboratories,Healthcare,Medical Devices,1.80E+11,07-12-2046,103.43,NYQ,United States
+44,GE,GE Aerospace,Industrials,Aerospace & Defense,1.77E+11,08-09-2047,161.38,NYQ,United States
+45,TXN,Texas Instruments Incorporated,Technology,Semiconductors,1.76E+11,05-10-2050,193.3,NMS,United States
+46,AMAT,"Applied Materials, Inc.",Technology,Semiconductor Equipment & Materials,1.76E+11,27-06-2049,212.22,NMS,United States
+47,VZ,Verizon Communications Inc.,Communication Services,Telecom Services,1.75E+11,12-02-2047,41.56,NYQ,United States
+48,AXP,American Express Company,Financial Services,Credit Services,1.71E+11,23-05-2047,237.25,NYQ,United States
+49,PFE,"Pfizer, Inc.",Healthcare,Drug Manufacturers - General,1.67E+11,22-08-2053,29.49,NYQ,United States
+50,AMGN,Amgen Inc.,Healthcare,Drug Manufacturers - General,1.65E+11,05-08-2048,307.37,NMS,United States
+51,PM,Philip Morris International Inc,Consumer Defensive,Tobacco,1.61E+11,28-11-2049,103.79,NYQ,United States
+52,CAT,"Caterpillar, Inc.",Industrials,Farm & Heavy Construction Machinery,1.60E+11,08-01-2048,327.57,NYQ,United States
+53,INTU,Intuit Inc.,Technology,Software - Application,1.60E+11,25-02-2051,572.06,NMS,United States
+54,NEE,"NextEra Energy, Inc.",Utilities,Utilities - Regulated Electric,1.59E+11,14-09-2050,77.15,NYQ,United States
+55,MS,Morgan Stanley,Financial Services,Capital Markets,1.57E+11,02-12-2048,96.58,NYQ,United States
+56,CMCSA,Comcast Corporation,Communication Services,Telecom Services,1.55E+11,07-03-2053,39.56,NMS,United States
+57,IBM,International Business Machines,Technology,Information Technology Services,1.52E+11,26-11-2049,165.81,NYQ,United States
+58,GS,"Goldman Sachs Group, Inc. (The)",Financial Services,Capital Markets,1.47E+11,06-01-2052,455.3,NYQ,United States
+59,ISRG,"Intuitive Surgical, Inc.",Healthcare,Medical Instruments & Supplies,1.44E+11,12-09-2049,406.61,NMS,United States
+60,BX,Blackstone Inc.,Financial Services,Asset Management,1.44E+11,28-01-2050,119.08,NYQ,United States
+61,RTX,RTX Corporation,Industrials,Aerospace & Defense,1.43E+11,21-05-2047,107.9,NYQ,United States
+62,NKE,"Nike, Inc.",Consumer Cyclical,Footwear & Accessories,1.43E+11,25-05-2053,94.74,NYQ,United States
+63,MU,"Micron Technology, Inc.",Technology,Semiconductors,1.40E+11,06-10-2050,126.64,NMS,United States
+64,UNP,Union Pacific Corporation,Industrials,Railroads,1.39E+11,20-03-2049,227.62,NYQ,United States
+65,NOW,"ServiceNow, Inc.",Technology,Software - Application,1.38E+11,05-06-2050,672,NYQ,United States
+66,SPGI,S&P Global Inc.,Financial Services,Financial Data & Stock Exchanges,1.35E+11,13-05-2049,431.84,NYQ,United States
+67,HON,Honeywell International Inc.,Industrials,Conglomerates,1.35E+11,03-02-2051,207.23,NMS,United States
+68,UBER,"Uber Technologies, Inc.",Technology,Software - Application,1.35E+11,19-08-2047,64.55,NYQ,United States
+69,SCHW,Charles Schwab Corporation (The,Financial Services,Capital Markets,1.32E+11,15-01-2051,71.99,NYQ,United States
+70,T,AT&T Inc.,Communication Services,Telecom Services,1.32E+11,25-07-2049,18.35,NYQ,United States
+71,COP,ConocoPhillips,Energy,Oil & Gas E&P,1.31E+11,04-05-2048,112.27,NYQ,United States
+72,SYK,Stryker Corporation,Healthcare,Medical Devices,1.30E+11,03-05-2053,342,NYQ,United States
+73,BKNG,Booking Holdings Inc. Common St,Consumer Cyclical,Travel Services,1.29E+11,21-11-2048,3801.36,NMS,United States
+74,INTC,Intel Corporation,Technology,Semiconductors,1.28E+11,01-07-2050,30.03,NMS,United States
+75,ETN,"Eaton Corporation, PLC",Industrials,Specialty Industrial Machinery,1.26E+11,22-06-2046,316.17,NYQ,United States
+76,ELV,"Elevance Health, Inc.",Healthcare,Healthcare Plans,1.26E+11,05-02-2048,540.43,NYQ,United States
+77,PGR,Progressive Corporation (The),Financial Services,Insurance - Property & Casualty,1.24E+11,06-07-2049,211.97,NYQ,United States
+78,LOW,"Lowe's Companies, Inc.",Consumer Cyclical,Home Improvement Retail,1.23E+11,04-12-2049,216.53,NYQ,United States
+79,VRTX,Vertex Pharmaceuticals Incorpor,Healthcare,Biotechnology,1.23E+11,26-11-2050,474.95,NMS,United States
+80,LRCX,Lam Research Corporation,Technology,Semiconductor Equipment & Materials,1.21E+11,29-06-2046,922.73,NMS,United States
+81,TJX,"TJX Companies, Inc. (The)",Consumer Cyclical,Apparel Retail,1.20E+11,16-10-2049,105.87,NYQ,United States
+82,BLK,"BlackRock, Inc.",Financial Services,Asset Management,1.17E+11,19-02-2050,785.29,NYQ,United States
+83,C,"Citigroup, Inc.",Financial Services,Banks - Diversified,1.16E+11,03-10-2048,61.03,NYQ,United States
+84,UPS,"United Parcel Service, Inc.",Industrials,Integrated Freight & Logistics,1.16E+11,22-09-2052,135.63,NYQ,United States
+85,BA,Boeing Company (The),Industrials,Aerospace & Defense,1.16E+11,17-11-2047,188.62,NYQ,United States
+86,ADI,"Analog Devices, Inc.",Technology,Semiconductors,1.14E+11,08-09-2048,230.63,NMS,United States
+87,LMT,Lockheed Martin Corporation,Industrials,Aerospace & Defense,1.13E+11,15-02-2052,468.89,NYQ,United States
+88,BSX,Boston Scientific Corporation,Healthcare,Medical Devices,1.12E+11,19-06-2049,75.92,NYQ,United States
+89,REGN,"Regeneron Pharmaceuticals, Inc.",Healthcare,Biotechnology,1.09E+11,29-10-2048,993.29,NMS,United States
+90,MDT,Medtronic plc.,Healthcare,Medical Devices,1.09E+11,25-05-2052,83.27,NYQ,United States
+91,CB,Chubb Limited,Financial Services,Insurance - Property & Casualty,1.08E+11,10-09-2047,264.81,NYQ,United States
+92,MMC,"Marsh & McLennan Companies, Inc",Financial Services,Insurance Brokers,1.03E+11,04-01-2049,208.49,NYQ,United States
+93,DE,Deere & Company,Industrials,Farm & Heavy Construction Machinery,1.02E+11,27-03-2052,369.37,NYQ,United States
+94,KLAC,KLA Corporation,Technology,Semiconductor Equipment & Materials,1.01E+11,28-05-2050,750.56,NMS,United States
+95,PLD,"Prologis, Inc.",Real Estate,REIT - Industrial,1.01E+11,14-07-2049,108.77,NYQ,United States
+96,ADP,"Automatic Data Processing, Inc.",Industrials,Staffing & Employment Services,1.01E+11,22-06-2048,245.67,NMS,United States
+97,CI,The Cigna Group,Healthcare,Healthcare Plans,95749980160,10-02-2050,337.06,NYQ,United States
+98,PANW,"Palo Alto Networks, Inc.",Technology,Software - Infrastructure,93931143168,25-09-2050,290.09,NMS,United States
+99,SBUX,Starbucks Corporation,Consumer Cyclical,Restaurants,93776240640,14-05-2052,82.79,NMS,United States
+100,AMT,American Tower Corporation (REI,Real Estate,REIT - Specialty,93586464768,30-10-2049,200.41,NYQ,United States
+101,ABNB,"Airbnb, Inc.",Consumer Cyclical,Travel Services,93372858368,30-10-2048,147.08,NMS,United States
+102,ANET,"Arista Networks, Inc.",Technology,Computer Hardware,91871764480,26-05-2052,293.18,NYQ,United States
+103,MDLZ,"Mondelez International, Inc.",Consumer Defensive,Confectioners,91333197824,11-09-2047,68.09,NMS,United States
+104,SO,Southern Company (The),Utilities,Utilities - Regulated Electric,88250736640,05-01-2049,80.71,NYQ,United States
+105,FI,"Fiserv, Inc.",Technology,Information Technology Services,87131037696,28-03-2052,147.99,NYQ,United States
+106,HCA,"HCA Healthcare, Inc.",Healthcare,Medical Care Facilities,86955450368,29-05-2050,332,NYQ,United States
+107,SNPS,"Synopsys, Inc.",Technology,Software - Infrastructure,86066020352,15-07-2049,561.73,NMS,United States
+108,BMY,Bristol-Myers Squibb Company,Healthcare,Drug Manufacturers - General,84631429120,23-06-2048,41.75,NYQ,United States
+109,CMG,"Chipotle Mexican Grill, Inc.",Consumer Cyclical,Restaurants,84572913664,11-02-2050,3079.04,NYQ,United States
+110,WM,"Waste Management, Inc.",Industrials,Waste Management,81672536064,26-09-2050,203.63,NYQ,United States
+111,GD,General Dynamics Corporation,Industrials,Aerospace & Defense,81573904384,15-05-2052,297.32,NYQ,United States
+112,DUK,Duke Energy Corporation (Holdin,Utilities,Utilities - Regulated Electric,80727040000,31-10-2049,104.6,NYQ,United States
+113,MO,"Altria Group, Inc.",Consumer Defensive,Tobacco,80436617216,31-10-2048,46.83,NYQ,United States
+114,GILD,"Gilead Sciences, Inc.",Healthcare,Drug Manufacturers - General,79933743104,27-05-2052,64.16,NMS,United States
+115,ZTS,Zoetis Inc.,Healthcare,Drug Manufacturers - Specialty & Generic,78427987968,12-09-2047,171.88,NYQ,United States
+116,CDNS,"Cadence Design Systems, Inc.",Technology,Software - Application,78137843712,06-01-2049,287.13,NMS,United States
+117,APH,Amphenol Corporation,Technology,Electronic Components,78108557312,29-03-2052,130.05,NYQ,United States
+118,SHW,Sherwin-Williams Company (The),Basic Materials,Specialty Chemicals,77545422848,30-05-2050,305.84,NYQ,United States
+119,ICE,Intercontinental Exchange Inc.,Financial Services,Financial Data & Stock Exchanges,77296312320,16-07-2049,134.76,NYQ,United States
+120,CL,Colgate-Palmolive Company,Consumer Defensive,Household & Personal Products,76965568512,24-06-2048,93.81,NYQ,United States
+121,CVS,CVS Health Corporation,Healthcare,Healthcare Plans,75648589824,12-02-2050,60.26,NYQ,United States
+122,TDG,Transdigm Group Incorporated,Industrials,Aerospace & Defense,75030831104,27-09-2050,1340.83,NYQ,United States
+123,MCK,McKesson Corporation,Healthcare,Medical Distribution,74576863232,16-05-2052,573.73,NYQ,United States
+124,EQIX,"Equinix, Inc.",Real Estate,REIT - Specialty,72572485632,28-05-2052,764.68,NMS,United States
+125,TT,Trane Technologies plc,Industrials,Building Products & Equipment,72326250496,13-09-2047,319.53,NYQ,United States
+126,ITW,Illinois Tool Works Inc.,Industrials,Specialty Industrial Machinery,71815929856,07-01-2049,240.67,NYQ,United States
+127,FCX,"Freeport-McMoRan, Inc.",Basic Materials,Copper,71393550336,30-03-2052,49.7,NYQ,United States
+128,TGT,Target Corporation,Consumer Defensive,Discount Stores,69649997824,31-05-2050,150.55,NYQ,United States
+129,CTAS,Cintas Corporation,Industrials,Specialty Business Services,69246468096,17-07-2049,682.48,NMS,United States
+130,BDX,"Becton, Dickinson and Company",Healthcare,Medical Instruments & Supplies,68927938560,25-06-2048,238.5,NYQ,United States
+131,EOG,"EOG Resources, Inc.",Energy,Oil & Gas E&P,68850376704,13-02-2050,119.8,NYQ,United States
+132,NXPI,NXP Semiconductors N.V.,Technology,Semiconductors,68088647680,28-09-2050,266.3,NMS,United States
+133,ECL,Ecolab Inc.,Basic Materials,Specialty Chemicals,67257442304,17-05-2052,235.52,NYQ,United States
+134,PH,Parker-Hannifin Corporation,Industrials,Specialty Industrial Machinery,65870835712,29-05-2052,512.45,NYQ,United States
+135,MAR,Marriott International,Consumer Cyclical,Lodging,65838731264,14-09-2047,230.51,NMS,United States
+136,CSX,CSX Corporation,Industrials,Railroads,64063057920,08-01-2049,32.77,NMS,United States
+137,CEG,Constellation Energy Corporatio,Utilities,Utilities - Renewable,64036839424,31-03-2052,203.14,NMS,United States
+138,SLB,Schlumberger N.V.,Energy,Oil & Gas Equipment & Services,62047649792,18-07-2049,43.41,NYQ,United States
+139,AON,Aon plc,Financial Services,Insurance Brokers,61859123200,26-06-2048,284.5,NYQ,United States
+140,MPC,Marathon Petroleum Corporation,Energy,Oil & Gas Refining & Marketing,61749350400,14-02-2050,175.26,NYQ,United States
+141,MSI,"Motorola Solutions, Inc.",Technology,Communication Equipment,61581099008,29-09-2050,369.22,NYQ,United States
+142,PNC,"PNC Financial Services Group, I",Financial Services,Banks - Regional,61341347840,18-05-2052,154.16,NYQ,United States
+143,FDX,FedEx Corporation,Industrials,Integrated Freight & Logistics,60523618304,30-05-2052,245.95,NYQ,United States
+144,APD,"Air Products and Chemicals, Inc",Basic Materials,Specialty Chemicals,60089307136,15-09-2047,270.3,NYQ,United States
+145,RSG,"Republic Services, Inc.",Industrials,Waste Management,59005661184,09-01-2049,187.36,NYQ,United States
+146,ORLY,"O'Reilly Automotive, Inc.",Consumer Cyclical,Specialty Retail,57144942592,19-07-2049,970.3,NMS,United States
+147,SPG,"Simon Property Group, Inc.",Real Estate,REIT - Retail,57143926784,27-06-2048,152.47,NYQ,United States
+148,AJG,Arthur J. Gallagher & Co.,Financial Services,Insurance Brokers,55769653248,15-02-2050,255.22,NYQ,United States
+149,MRNA,"Moderna, Inc.",Healthcare,Biotechnology,55700099072,30-09-2050,145.34,NMS,United States
+150,PCAR,PACCAR Inc.,Industrials,Farm & Heavy Construction Machinery,55527923712,19-05-2052,105.94,NMS,United States
+151,MMM,3M Company,Industrials,Conglomerates,54566932480,31-05-2052,98.61,NYQ,United States
+152,OXY,Occidental Petroleum Corporatio,Energy,Oil & Gas E&P,53100687360,16-09-2047,59.89,NYQ,United States
+153,EW,Edwards Lifesciences Corporatio,Healthcare,Medical Devices,52673269760,10-01-2049,87.41,NYQ,United States
+154,VLO,Valero Energy Corporation,Energy,Oil & Gas Refining & Marketing,51190566912,20-07-2049,155.38,NYQ,United States
+155,CPRT,"Copart, Inc.",Industrials,Specialty Business Services,50992173056,28-06-2048,52.99,NMS,United States
+156,AIG,"American International Group, I",Financial Services,Insurance - Diversified,50870149120,16-02-2050,76.65,NYQ,United States
+157,WMB,"Williams Companies, Inc. (The)",Energy,Oil & Gas Midstream,50358747136,20-05-2052,41.32,NYQ,United States
+158,MET,"MetLife, Inc.",Financial Services,Insurance - Life,49999056896,17-09-2047,70.31,NYQ,United States
+159,TFC,Truist Financial Corporation,Financial Services,Banks - Regional,49041367040,11-01-2049,36.65,NYQ,United States
+160,DLR,"Digital Realty Trust, Inc.",Real Estate,REIT - Specialty,48047775744,21-07-2049,145.12,NYQ,United States
+161,TRV,"The Travelers Companies, Inc.",Financial Services,Insurance - Property & Casualty,48006090752,29-06-2048,209.64,NYQ,United States
+162,PCG,Pacific Gas & Electric Co.,Utilities,Utilities - Regulated Electric,47904964608,17-02-2050,18.32,NYQ,United States
+163,AZO,"AutoZone, Inc.",Consumer Cyclical,Specialty Retail,47848562688,21-05-2052,2790.98,NYQ,United States
+164,DHI,"D.R. Horton, Inc.",Consumer Cyclical,Residential Construction,47378116608,18-09-2047,143.87,NYQ,United States
+165,ROST,"Ross Stores, Inc.",Consumer Cyclical,Apparel Retail,47258169344,12-01-2049,140.94,NMS,United States
+166,DXCM,"DexCom, Inc.",Healthcare,Medical Devices,46413701120,22-07-2049,116.71,NMS,United States
+167,KMB,Kimberly-Clark Corporation,Consumer Defensive,Household & Personal Products,46260449280,30-06-2048,137.39,NYQ,United States
+168,OKE,"ONEOK, Inc.",Energy,Oil & Gas Midstream,46131458048,18-02-2050,79.04,NYQ,United States
+169,HES,Hess Corporation,Energy,Oil & Gas E&P,45612900352,22-05-2052,148.04,NYQ,United States
+170,SMCI,"Super Micro Computer, Inc.",Technology,Computer Hardware,45182779392,19-09-2047,771.61,NMS,United States
+171,CCI,Crown Castle Inc.,Real Estate,REIT - Specialty,45025275904,13-01-2049,103.62,NYQ,United States
+172,D,"Dominion Energy, Inc.",Utilities,Utilities - Regulated Electric,44659879936,23-07-2049,53.28,NYQ,United States
+173,BK,The Bank of New York Mellon Cor,Financial Services,Asset Management,44023926784,19-02-2050,58.87,NYQ,United States
+174,KMI,"Kinder Morgan, Inc.",Energy,Oil & Gas Midstream,43633008640,23-05-2052,19.66,NYQ,United States
+175,KHC,The Kraft Heinz Company,Consumer Defensive,Packaged Foods,43265511424,20-09-2047,35.63,NMS,United States
+176,ALL,Allstate Corporation (The),Financial Services,Insurance - Property & Casualty,43128991744,14-01-2049,163.42,NYQ,United States
+177,PRU,"Prudential Financial, Inc.",Financial Services,Insurance - Life,42363789312,24-07-2049,117.98,NYQ,United States
+178,AMP,"Ameriprise Financial, Inc.",Financial Services,Asset Management,42168381440,20-02-2050,424.55,NYQ,United States
+179,HSY,The Hershey Company,Consumer Defensive,Confectioners,40459956224,24-05-2052,200.07,NYQ,United States
+180,YUM,"Yum! Brands, Inc.",Consumer Cyclical,Restaurants,39862190080,21-09-2047,141.54,NYQ,United States
+181,IQV,"IQVIA Holdings, Inc.",Healthcare,Diagnostics & Research,39570194432,15-01-2049,217.18,NYQ,United States
+182,DOW,Dow Inc.,Basic Materials,Chemicals,38781812736,25-07-2049,55.15,NYQ,United States
+183,NUE,Nucor Corporation,Basic Materials,Steel,38644838400,21-02-2050,161.18,NYQ,United States
+184,GIS,"General Mills, Inc.",Consumer Defensive,Packaged Foods,38468366336,25-05-2052,68.14,NYQ,United States
+185,CNC,Centene Corporation,Healthcare,Healthcare Plans,37430632448,22-09-2047,70.14,NYQ,United States
+186,CTVA,"Corteva, Inc.",Basic Materials,Agricultural Inputs,37427613696,16-01-2049,53.7,NYQ,United States
+187,CMI,Cummins Inc.,Industrials,Specialty Industrial Machinery,37355982848,26-07-2049,273.11,NYQ,United States
+188,VRSK,"Verisk Analytics, Inc.",Industrials,Consulting Services,36845821952,22-02-2050,258.25,NMS,United States
+189,KVUE,Kenvue Inc.,Consumer Defensive,Household & Personal Products,36668608512,26-05-2052,19.15,NYQ,United States
+190,GEHC,GE HealthCare Technologies Inc.,Healthcare,Health Information Services,35385163776,23-09-2047,77.52,NMS,United States
+191,MPWR,"Monolithic Power Systems, Inc.",Technology,Semiconductors,35363127296,17-01-2049,726.56,NMS,United States
+192,MLM,"Martin Marietta Materials, Inc.",Basic Materials,Building Materials,34259621888,27-07-2049,555.8,NYQ,United States
+193,FANG,"Diamondback Energy, Inc.",Energy,Oil & Gas E&P,33746251776,23-02-2050,189.22,NMS,United States
+194,HWM,Howmet Aerospace Inc.,Industrials,Aerospace & Defense,33589381120,27-05-2052,82.29,NYQ,United States
+195,EXR,Extra Space Storage Inc,Real Estate,REIT - Industrial,32640862208,24-09-2047,148.06,NYQ,United States
+196,CTSH,Cognizant Technology Solutions ,Technology,Information Technology Services,32491954176,18-01-2049,65.35,NMS,United States
+197,FICO,Fair Isaac Corproation,Technology,Software - Application,32191877120,28-07-2049,1302.74,NYQ,United States
+198,CSGP,"CoStar Group, Inc.",Real Estate,Real Estate Services,32115091456,24-02-2050,78.62,NMS,United States
+199,GLW,Corning Incorporated,Technology,Electronic Components,31703468032,28-05-2052,37.01,NYQ,United States
+200,RMD,ResMed Inc.,Healthcare,Medical Instruments & Supplies,31023820800,25-09-2047,211.18,NYQ,United States
+201,PPG,"PPG Industries, Inc.",Basic Materials,Specialty Chemicals,30878957568,19-01-2049,131.68,NYQ,United States
+202,ADM,Archer-Daniels-Midland Company,Consumer Defensive,Farm Products,30566158336,29-07-2049,61.82,NYQ,United States
+203,MTD,"Mettler-Toledo International, I",Healthcare,Diagnostics & Research,30046230528,25-02-2050,1406.83,NYQ,United States
+204,VICI,VICI Properties Inc.,Real Estate,REIT - Diversified,29949698048,29-05-2052,28.71,NYQ,United States
+205,DVN,Devon Energy Corporation,Energy,Oil & Gas E&P,29482801152,26-09-2047,46.65,NYQ,United States
+206,EIX,Edison International,Utilities,Utilities - Regulated Electric,29441298432,20-01-2049,76.52,NYQ,United States
+207,WAB,Westinghouse Air Brake Technolo,Industrials,Railroads,29066481664,30-07-2049,164.79,NYQ,United States
+208,FSLR,"First Solar, Inc.",Technology,Solar,28491104256,26-02-2050,266.17,NMS,United States
+209,AVB,"AvalonBay Communities, Inc.",Real Estate,REIT - Residential,28000688128,30-05-2052,196.93,NYQ,United States
+210,CHD,"Church & Dwight Company, Inc.",Consumer Defensive,Household & Personal Products,26435383296,27-09-2047,108.11,NYQ,United States
+211,CBRE,CBRE Group Inc,Real Estate,Real Estate Services,26276407296,21-01-2049,85.64,NYQ,United States
+212,TROW,"T. Rowe Price Group, Inc.",Financial Services,Asset Management,26030080000,31-07-2049,116.57,NMS,United States
+213,TRGP,"Targa Resources, Inc.",Energy,Oil & Gas Midstream,25881024512,27-02-2050,116.73,NYQ,United States
+214,BRO,"Brown & Brown, Inc.",Financial Services,Insurance Brokers,25643884544,31-05-2052,89.9,NYQ,United States
+215,VLTO,Veralto Corp,Industrials,Pollution & Treatment Controls,24793313280,28-09-2047,100.44,NYQ,United States
+216,FITB,Fifth Third Bancorp,Financial Services,Banks - Regional,24741906432,22-01-2049,36.17,NMS,United States
+217,MTB,M&T Bank Corporation,Financial Services,Banks - Regional,24445777920,28-02-2050,146.51,NYQ,United States
+218,PHM,"PulteGroup, Inc.",Consumer Cyclical,Residential Construction,23745507328,29-09-2047,112.89,NYQ,United States
+219,KEYS,Keysight Technologies Inc.,Technology,Scientific & Technical Instruments,23709378560,23-01-2049,135.84,NYQ,United States
+220,CCL,Carnival Corporation,Consumer Cyclical,Travel Services,22191400960,30-09-2047,16.94,NYQ,United States
+221,TER,"Teradyne, Inc.",Technology,Semiconductor Equipment & Materials,21796356096,24-01-2049,139.62,NMS,United States
+222,WRB,W.R. Berkley Corporation,Financial Services,Insurance - Property & Casualty,20539883520,25-01-2049,80.34,NYQ,United States
+223,LDOS,"Leidos Holdings, Inc.",Technology,Information Technology Services,19540838400,26-01-2049,144.52,NYQ,United States
+224,AVY,Avery Dennison Corporation,Consumer Cyclical,Packaging & Containers,18323482624,27-01-2049,227.47,NYQ,United States
+225,ESS,"Essex Property Trust, Inc.",Real Estate,REIT - Residential,17534896128,28-01-2049,263.81,NYQ,United States
+226,EG,"Everest Group, Ltd.",Financial Services,Insurance - Reinsurance,16718803968,29-01-2049,384.71,NYQ,United States
+227,NWSA,News Corporation,Communication Services,Entertainment,15650032640,30-01-2049,27.23,NMS,United States
+228,FDS,FactSet Research Systems Inc.,Financial Services,Financial Data & Stock Exchanges,15099574272,31-01-2049,396.15,NYQ,United States

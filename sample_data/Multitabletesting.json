@@ -1,5 +1,5 @@
 {
-    "tables": {
+    "Table": {
         "Benchmark_Provider": {
             "primary_key": "BM_PROVIDER_ID",
             "columns": {
@@ -7,10 +7,12 @@
                     "sdtype": "id"
                 },
                 "BM_PROVIDER": {
-                    "sdtype": "categorical"
+                    "sdtype": "id",
+                    "regex_format": "[A-Z]{5,7}$"
                 },
                 "SHORT_DESCRIPTION": {
-                    "sdtype": "categorical"
+                    "sdtype": "id",
+                    "regex_format": "[A-Z]{5,7}$"
                 },
                 "DESCRITPION": {
                     "sdtype": "categorical"
@@ -37,7 +39,28 @@
                 }
             }
         },
-       
+        "Benchmark_Constituent": {
+            "primary_key": "BM_CONSTITUENT_ID",
+            "columns": {
+                "BM_CONSTITUENT_ID": {
+                    "sdtype": "id"
+                },
+                "BENCHMARK_ID": {
+                    "sdtype": "id"
+                },
+                "SECURITY_ID": {
+                    "sdtype": "id"
+                },
+                "WEIGHT(%)": {
+                    "computer_representation": "Float",
+                    "sdtype": "numerical"
+                },
+                "MARKET_VALUE": {
+                    "computer_representation": "Float",
+                    "sdtype": "numerical"
+                }
+            }
+        },
         "Securities": {
             "primary_key": "SECURITY_ID",
             "columns": {
@@ -47,42 +70,10 @@
                 "TICKER": {
                     "sdtype": "id",
                     "regex_format": "[A-Z]{5,7}$"
-                },
-                "SECURITY_NAME": {
-                    "sdtype": "company"
-                },
-                "SECTOR": {
-                    "sdtype": "categorical"
-                },
-                "MARKET_CAP_USD": {
-                    "sdtype": "numerical",
-                    "computer_representation": "Float"
-                },
-                "MATURITY_DATE": {
-                    "sdtype": "datetime",
-                    "datetime_format": "%d-%m-%Y"
-                },
-                "CURRENT_PRICE": {
-                    "sdtype": "id",
-                    "regex_format": "[1-9][0-9][0-9]\\.\\d{2}$"
-                },
-                "LISTING_EXCHANGE": {
-                    "sdtype": "categorical"
-                },
-                "COUNTRY": {
-                    "sdtype": "country"
                 }
+
             }
         }
     },
-    "relationships": [
-        {
-            "parent_table_name": "Benchmark_Provider",
-            "child_table_name": "Benchmarks",
-            "parent_primary_key": "BM_PROVIDER_ID",
-            "child_foreign_key": "BM_PROVIDER_ID"
-        }
-       
-    ]
-   
+    "METADATA_SPEC_VERSION": "MULTI_TABLE_V1"
 }

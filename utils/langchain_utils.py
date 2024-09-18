@@ -10,7 +10,6 @@ from sdv.lite import SingleTablePreset
 import pandas as pd
 import streamlit as st
 from langchain.chains import ConversationChain
-from langchain_community.chat_models import ChatGooglePalm
 from langchain_google_genai import ChatGoogleGenerativeAI
 import kuzu
 

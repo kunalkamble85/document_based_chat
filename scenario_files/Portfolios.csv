@@ -1,0 +1,11 @@
+﻿PORTFOLIO_ID,TICKER,NAME,DESCRIPTION,CURRENCY,CREATION_DATE,MODIFIED_DATE
+1,SPLG,SPDR® Portfolio S&P 500® ETF,S&P 500 Index,USD      ,30-05-2024,30-05-2024
+2,SPYG,SPDR® Portfolio S&P 500® Growth ETF,S&P 500 Growth Index,USD      ,30-05-2024,30-05-2024
+3,SPYD,SPDR® Portfolio S&P 500® High Dividend ETF,S&P 500 High Dividend Index,USD      ,30-05-2024,30-05-2024
+4,SPYV,SPDR® Portfolio S&P 500® Value ETF,S&P 500 Value Index,USD      ,30-05-2024,30-05-2024
+5,SPSM,SPDR® Portfolio S&P 600™ Small Cap ETF,S&P SmallCap 600 Index,USD      ,30-05-2024,30-05-2024
+6,SPDG,SPDR® Portfolio S&P Sector Neutral Dividend ETF,S&P Sector-Neutral High Yield Dividend Aristocrats Index,USD      ,30-05-2024,30-05-2024
+7,ONEV,SPDR® Russell 1000 Low Volatility Focus ETF,Russell 1000 Low Volatility Focused Factor Index,USD      ,30-05-2024,30-05-2024
+8,ONEO,SPDR® Russell 1000 Momentum Focus ETF,Russell 1000 Momentum Focused Factor Index,USD      ,30-05-2024,30-05-2024
+9,ONEY,SPDR® Russell 1000 Yield Focus ETF,Russell 1000 Yield Focused Factor Index,USD      ,30-05-2024,30-05-2024
+10,MDYG,SPDR® S&P 400™ Mid Cap Growth ETF,S&P MidCap 400 Growth Index,USD      ,31-05-2024,31-05-2024

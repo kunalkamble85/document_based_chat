@@ -1,0 +1,13 @@
+{ 
+    "METADATA_SPEC_VERSION": "SINGLE_TABLE_V1",
+    "primary_key": "SECURITY_ID",
+    "columns": {
+        "SECURITY_ID": {
+            "sdtype": "id"
+        },
+        "TICKER": {
+            "sdtype": "id",
+            "regex_format": "[A-Z]{5,7}$"
+        }  
+    }
+}

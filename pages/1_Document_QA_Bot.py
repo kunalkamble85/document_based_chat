@@ -1,6 +1,6 @@
 import streamlit as st
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.chat_models import ChatGooglePalm
+from langchain_community.chat_models import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from PIL import Image
 from utils.file_reader import *
@@ -32,8 +32,13 @@ def get_conversation_chain():
     Give short answers for the questions.
     question:\{question}\nText:{context}
     """
-    model = ChatGooglePalm(temprature = 0.1, model_kwargs={"max_length": 200})
-    # model = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
+    if st.session_state.LLM_MODEL == "gpt-4o-mini":
+        print("Calling Open AI model")
+        model = ChatOpenAI(model="gpt-4o-mini", max_tokens="200")
+    else:
+        print("Calling Google Palm")
+        model = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
+
     prompt = PromptTemplate(template=prompt_template, input_variables=["context","question"])
     chain = load_qa_chain(model, chain_type="stuff",prompt=prompt)
     return chain
@@ -55,9 +60,9 @@ def search_text_fs(question, filename):
     vectordb.index.distance_measure = "cosine"
 
     if filename == ["All"]:
-        results = vectordb.similarity_search_with_score(query=question, k=10)
+        results = vectordb.similarity_search_with_score(query=question, k=3)
     else:
-        results = vectordb.similarity_search_with_score(query=question, k=10, filter={"filename":filename})
+        results = vectordb.similarity_search_with_score(query=question, k=3, filter={"filename":filename})
     print(results)
     for doc, score in results:
         if score < 0.99:

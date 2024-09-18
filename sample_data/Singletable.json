@@ -1,5 +1,5 @@
-{ 
-   
+{
+    "METADATA_SPEC_VERSION": "SINGLE_TABLE_V1",
     "primary_key": "SECURITY_ID",
     "columns": {
         "SECURITY_ID": {
@@ -9,7 +9,15 @@
             "sdtype": "id",
             "regex_format": "[A-Z]{5,7}$"
         },
-    
+        "SECURITY_NAME": {
+            "sdtype": "categorical"
+        },
+        "SECTOR": {
+            "sdtype": "categorical"
+        },
+        "INDUSTRY":{
+            "sdtype":"categorical"
+        },
         "MARKET_CAP_USD": {
             "sdtype": "numerical"
         },
@@ -26,8 +34,10 @@
         },
         "COUNTRY": {
             "sdtype": "categorical"
-        } 
-
+        }
+    },
+    "constraint_class": "FixedCombinations",
+    "constraint_parameters": {
+        "column_names": ["SECTOR", "INDUSTRY","SECURITY_NAME"]
     }
-   
 }

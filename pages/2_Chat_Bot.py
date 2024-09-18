@@ -1,6 +1,6 @@
 import streamlit as st
 from langchain.chains import ConversationChain
-from langchain_community.chat_models import ChatGooglePalm
+from langchain_google_genai import ChatGoogleGenerativeAI
 from PIL import Image
 
 st.set_page_config(page_title="Chat with AI", page_icon=":book:", layout="wide")
@@ -8,7 +8,7 @@ st.title("🤖 Chat with AI")
 
 
 def user_input(user_question):
-    llm = ChatGooglePalm(temprature = 0.5, model_kwargs={"max_length": 200})
+    llm = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
     output = llm.invoke(user_question)
     return output.content
 

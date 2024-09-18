@@ -1,11 +1,16 @@
 import streamlit as st
 import pandas as pd
 import zipfile
+import numpy as np
 import json
 from sdv.single_table import GaussianCopulaSynthesizer
 from sdv.multi_table import HMASynthesizer
 from sdv.metadata import SingleTableMetadata, MultiTableMetadata
 from sdv.utils import drop_unknown_references
+import google.generativeai as genai
+
+# Set up Google Gemini Pro API key and model
+model = genai.GenerativeModel("gemini-pro")
 
 st.set_page_config(page_title="Synthetic Data Generation", page_icon=":book:", layout="wide")
 st.title("🤖 Synthetic Data Generation")
@@ -157,6 +162,21 @@ def metadata_to_json(metadata):
             if 'constraint_class' in table_metadata and 'constraint_parameters' in table_metadata:
                 table_metadata['constraint_class'] = table_metadata['constraint_class']
                 table_metadata['constraint_parameters'] = table_metadata['constraint_parameters']
+        return json.dumps(metadata_dict, indent=4)    
+def metadata_to_json(metadata):
+    if isinstance(metadata, SingleTableMetadata):
+        metadata_dict = metadata.to_dict()
+        if hasattr(metadata, 'constraint_class') and hasattr(metadata, 'constraint_parameters'):
+            metadata_dict['constraint_class'] = metadata.constraint_class
+            metadata_dict['constraint_parameters'] = metadata.constraint_parameters
+        return json.dumps(metadata_dict, indent=4)
+    
+    elif isinstance(metadata, MultiTableMetadata):
+        metadata_dict = metadata.to_dict()
+        for table_name, table_metadata in metadata_dict['tables'].items():
+            if 'constraint_class' in table_metadata and 'constraint_parameters' in table_metadata:
+                table_metadata['constraint_class'] = table_metadata['constraint_class']
+                table_metadata['constraint_parameters'] = table_metadata['constraint_parameters']
         return json.dumps(metadata_dict, indent=4)
 
 @st.cache_data
@@ -227,16 +247,18 @@ def process_multi_table_Generic(dataframes, scale, metadata_file=None):
 def process_single_table_Scenario(df, scale, metadata_json=None):
     try:
         metadata = detect_single_table_metadata(df)
-
+        
         if metadata_json:
             json_data = json.loads(metadata_json)
+            # st.write("Applying metadata JSON:", json_data)  # Debugging line
             apply_metadata_from_json(metadata, json_data)
+            # st.write("Updated Metadata:", metadata.to_dict())  # Debugging line
 
         if not validate_metadata(metadata, df):
             return None, None
 
         synthesizer = GaussianCopulaSynthesizer(metadata)
-        
+
         if hasattr(metadata, 'constraint_class') and hasattr(metadata, 'constraint_parameters'):
             my_constraint = {
                 'constraint_class': metadata.constraint_class,
@@ -251,14 +273,16 @@ def process_single_table_Scenario(df, scale, metadata_json=None):
     except Exception as e:
         st.error(f"Error generating synthetic data: {e}")
         return None, None
-    
+
 def process_multi_table_Scenario(dataframes, scale, metadata_json=None):
     try:
         metadata = detect_multi_table_metadata(dataframes)
-
+        
         if metadata_json:
             json_data = json.loads(metadata_json)
+            # st.write("Applying metadata JSON:", json_data)  # Debugging line
             apply_metadata_from_json(metadata, json_data)
+            # st.write("Updated Metadata:", metadata.to_dict())  # Debugging line
 
         if not validate_metadata(metadata, dataframes):
             return None, None
@@ -266,7 +290,7 @@ def process_multi_table_Scenario(dataframes, scale, metadata_json=None):
         df_cleaned = drop_unknown_references(dataframes, metadata)
 
         synthesizer = HMASynthesizer(metadata)
-        
+
         constraints = []
         for table_name, table_metadata in metadata.tables.items():
             if hasattr(table_metadata, 'constraint_class') and hasattr(table_metadata, 'constraint_parameters'):
@@ -276,7 +300,7 @@ def process_multi_table_Scenario(dataframes, scale, metadata_json=None):
                     'constraint_parameters': table_metadata.constraint_parameters
                 }
                 constraints.append(my_constraint)
-        
+
         if constraints:
             synthesizer.add_constraints(constraints=constraints)
             
@@ -289,53 +313,110 @@ def process_multi_table_Scenario(dataframes, scale, metadata_json=None):
     except Exception as e:
         st.error(f"Error generating synthetic data: {e}")
         return None, None
+    
+  # Normalize the WEIGHT(%) column
+def normalize_weights(df, weight_column='WEIGHT(%)'):
+    total_weight = df[weight_column].sum()
+    
+    if total_weight == 0:
+        st.error("Total weight is zero, normalization not possible.")
+        return df
+    
+    # Normalize the weights
+    df[weight_column] = df[weight_column] / total_weight
+    
+    # Adjust for any floating-point errors to ensure the sum is strictly 1
+    difference = 1 - df[weight_column].sum()
+    df[weight_column].iloc[-1] += difference  # Adjust the last value to correct any deviation
+    
+    return df    
 
 
 def convert_df(df):
     return df.to_csv(index=False).encode('utf-8')
 
+
+
+def fetch_bm_name_from_llm(bm_provider_id):
+    try:
+        # Convert bm_provider_id to string
+        bm_provider_id_str = str(bm_provider_id)
+
+        # Generate content using model.generate_content with proper arguments
+        response = model.generate_content(
+            'Generate unique and distinctive names for benchmarks that do not repeat like S&P 500 Index,S&P 500 Growth Index  : ',
+            generation_config=genai.GenerationConfig(temperature=0.1)
+        )
+
+        # Print the full response for debugging
+        # st.write(f"LLM Response for BM_PROVIDER_ID {bm_provider_id}: {response}")
+
+        # Extract the generated text from the nested response (candidates -> content -> parts -> text)
+        generated_text = ''
+        if response and hasattr(response, 'candidates') and len(response.candidates) > 0:
+            generated_text = response.candidates[0].content.parts[0].text.strip()
+
+        # Split the generated text into lines and remove numbering (e.g., '1. ', '2. ')
+        benchmark_names = generated_text.split("\n")
+        benchmark_names = [name.split('. ', 1)[-1].strip() for name in benchmark_names if name.strip()]
+
+        if not benchmark_names:
+            st.warning(f"BM_NAME not generated for BM_PROVIDER_ID: {bm_provider_id}")
+            benchmark_names = ["S&P 500 Multicap Index"]  # Provide a default value if empty
+
+        return benchmark_names
+
+    except Exception as e:
+        st.error(f"Error fetching BM_NAME from LLM: {e}")
+        return ["Error in BM_NAME generation"]
+
+def clean_bm_name(name):
+    # Remove any characters like -, *, and strip leading/trailing whitespace
+    return re.sub(r'[-*]', '', name).strip()
+
 # Define local rules and paths for scenarios
-local_rules = {
-    "Securities": r"C:\SDG\rules\Securities.json",
-    "Benchmark_Provider": r"C:\SDG\rules\Benchmark_Provider.json",
-    "Portfolios": r"C:\SDG\rules\Portfolios.json",
-    "Counter_Parties": r"C:\SDG\rules\Counter_parties.json",
-    "Benchmarks": r"C:\SDG\rules\Benchmarks.json",
-    "Benchmark_Constituent": r"C:\SDG\rules\Benchmark_Constituent.json",
-    "Holding": r"C:\SDG\rules\Holding.json"
-}
-
-local_paths = {
-    "Securities": r"C:\SDG\samplefile\Securities.csv",
-    "Benchmark_Provider": r"C:\SDG\samplefile\Benchmark_Provider.csv",
-    "Portfolios": r"C:\SDG\samplefile\Portfolios.csv",
-    "Counter_Parties": r"C:\SDG\samplefile\Counter_Parties.csv",
-    "Benchmarks": [r"C:\SDG\samplefile\Benchmarks.csv",
-                   r"C:\SDG\samplefile\Benchmark_Provider.csv"],
-    "Benchmark_Constituent": [
-        r"C:\SDG\samplefile\Benchmark_Constituent.csv",
-        r"C:\SDG\samplefile\Benchmarks.csv",
-        r"C:\SDG\samplefile\Securities.csv"
-    ],
-    "Holding": [
-        r"C:\SDG\samplefile\Holding.csv",
-        r"C:\SDG\samplefile\Benchmarks.csv",
-        r"C:\SDG\samplefile\Securities.csv",
-        r"C:\SDG\samplefile\Portfolios.csv"
-    ]
-}
-
 sample_rules = {
-    "Single Table": r"C:\SDG\rules\Securities.json",
-    "Multi Table": r"C:\SDG\rules\multitablemetadata .json",
-    "Partial Single Table": r"C:\SDG\rules\Singletable.json",
-    "Partial Multi Table": r"C:\SDG\rules\Multitable metadata.json"
+    "Single Table": r"./sample_data/Singletable.json",
+    "Multi Table": r"./sample_data/multitablemetadata .json",
+    "Partial single Table": r"./sample_data/SingletableTesting.json",
+    "Partial Multi Table": r"./sample_data/Multitabletesting.json"
 }
 
 # Define sample files
 sample_files = {
-    "Single Table": r"C:\SDG\samplefile\Securities.csv",
-    "Multi Table": r"C:\SDG\samplefile\samplefiles.zip"
+    "Single Table": r"./sample_data/Securities.csv",
+    "Multi Table": r"./sample_data/samplefiles.zip"
+}
+
+local_paths = {
+    "Securities": r"./scenario_files/Securities.csv",
+    "Benchmark_Provider": r"./scenario_files/Benchmark_Provider.csv",
+    "Portfolios": r"./scenario_files/Portfolios.csv",
+    "Counter_Parties": r"./scenario_files/counter_parties.csv",
+    "Benchmarks": [r"./scenario_files/Benchmarks.csv",
+                   r"./scenario_files/Benchmark_Provider.csv"],
+    "Benchmark_Constituent": [
+        r"./scenario_files/Benchmark_Constituent.csv",
+        r"./scenario_files/Benchmarks.csv",
+        r"./scenario_files/Securities.csv"
+
+    ],
+    "Holding": [
+        r"./scenario_files/Holding.csv",
+        r"./scenario_files/Benchmarks.csv",
+        r"./scenario_files/Securities.csv",
+        r"./scenario_files/Portfolios.csv"
+    ]
+}
+
+local_rules = {
+    "Securities": r"./scenario_rules/Securities.json",
+    "Benchmark_Provider": r"./scenario_rules/Benchmark_Provider.json",
+    "Portfolios": r"./scenario_rules/Portfolios.json",
+    "Counter_Parties": r"./scenario_rules/Counter_parties.json",
+    "Benchmarks": r"./scenario_rules/Benchmarks.json",
+    "Benchmark_Constituent": r"./scenario_rules/Benchmark_Constituent.json",
+    "Holding": r"./scenario_rules/Holding.json"
 }
 
 mode = st.radio("Select Mode", ["Generic", "Scenario"])
@@ -449,44 +530,273 @@ if mode == "Generic":
                                 "application/json"
                             )
 
-
-elif mode == "Scenario": 
+if mode == "Scenario":
     selected_scenario = st.sidebar.selectbox("Select Scenario", [
         "Securities", "Benchmark_Provider", "Benchmarks", "Benchmark_Constituent", "Portfolios", 
         "Holding", "Counter_Parties"
-    ])   
+    ])
 
-    if selected_scenario:
-        scale = st.sidebar.slider("Select Scale", min_value=1, max_value=100, value=5, step=5)
+    if selected_scenario == "Benchmark_Constituent":
+       # Load Benchmarks.csv to get BM_NAME to BENCHMARK_ID mapping
+        benchmarks_csv_path = local_paths["Benchmark_Constituent"][1]  # Benchmarks.csv
+        benchmarks_df = pd.read_csv(benchmarks_csv_path)
+        bm_name_to_id = benchmarks_df[['BM_NAME', 'BENCHMARK_ID']].dropna().drop_duplicates().set_index('BM_NAME').to_dict()['BENCHMARK_ID']
+        bm_name_values = list(bm_name_to_id.keys())
+        selected_bm_name = st.sidebar.selectbox("Select BM_NAME", bm_name_values)
 
-        if selected_scenario in ["Benchmarks", "Benchmark_Constituent", "Holding"]:
-            dataframes = {}
-            for path in local_paths[selected_scenario]:
-                try:
-                    df = pd.read_csv(path)
-                    table_name = path.split("\\")[-1].split(".")[0]
-                    dataframes[table_name] = df
-                except Exception as e:
-                    st.error(f"Error reading file {path}: {e}")
+        # Load Benchmark_Constituent.csv and Securities.csv
+        benchmark_constituent_path = local_paths["Benchmark_Constituent"][0]  # Benchmark_Constituent.csv
+        securities_path = local_paths["Benchmark_Constituent"][2]  # Securities.csv
 
+        benchmark_constituent_df = pd.read_csv(benchmark_constituent_path)
+        securities_df = pd.read_csv(securities_path)
+        security_ids = securities_df['SECURITY_ID'].dropna().unique()
+
+
+        if selected_bm_name:
+            # Update BENCHMARK_ID in Benchmark_Constituent DataFrame
+            benchmark_constituent_df['BENCHMARK_ID'] = bm_name_to_id.get(selected_bm_name, benchmark_constituent_df['BENCHMARK_ID'])
+            
+            # Text input for number of rows
+            num_rows = st.sidebar.text_input("Enter the number of rows required", value="10")
+
+            try:
+                num_rows = int(num_rows)
+            except ValueError:
+                st.sidebar.error("Please enter a valid number.")
+                num_rows = 0
+
+            metadata_file_path = local_rules["Benchmark_Constituent"]
+            try:
+                with open(metadata_file_path, "r", encoding='utf-8') as metadata_file:
+                    metadata_json = metadata_file.read()
+                    
+                    # Auto-detect metadata for single-table setup
+                    metadata = detect_single_table_metadata(benchmark_constituent_df)
+                    
+                    # Apply metadata from JSON (update columns)
+                    apply_metadata_from_json(metadata, json.loads(metadata_json))
+                    
+                    if st.button("Generate Data"):
+                        with st.spinner('Processing...'):
+                            # Generate synthetic data with the number of rows equal to num_rows
+                            metadata, synthetic_data = process_single_table_Scenario(benchmark_constituent_df, num_rows, metadata_json)
+                            if synthetic_data is not None:
+                                synthetic_data = synthetic_data.head(num_rows)  # Ensure the number of rows matches num_rows
+                                
+                                # Randomly assign SECURITY_ID values from the Securities table
+                                synthetic_data['SECURITY_ID'] = np.random.choice(security_ids, size=num_rows, replace=True)
+                                
+                                # Normalize the WEIGHT(%) column
+                                synthetic_data = normalize_weights(synthetic_data, weight_column='WEIGHT(%)')
+                                
+                                st.write(f"Synthetic Data with {num_rows} rows:")
+                                st.dataframe(synthetic_data)
+                                
+                                # Convert DataFrame to CSV
+                                csv = convert_df(synthetic_data)
+                                st.download_button(
+                                    label="Download Synthetic Data CSV",
+                                    data=csv,
+                                    file_name="synthetic_data.csv",
+                                    mime="text/csv"
+                                )
+                                
+                                # Download Metadata JSON
+                                if metadata:
+                                    metadata_json = metadata_to_json(metadata)
+                                    st.sidebar.download_button(
+                                        label="Download Metadata JSON",
+                                        data=metadata_json,
+                                        file_name="metadata.json",
+                                        mime="application/json"
+                                    )
+            except Exception as e:
+                st.error(f"Error reading or applying metadata file {metadata_file_path}: {e}")
+
+    elif selected_scenario == "Holding":
+        # Load Portfolios.csv to get NAME to PORTFOLIO_ID mapping
+        portfolios_csv_path = local_paths["Holding"][3]  # Portfolios.csv
+        portfolios_df = pd.read_csv(portfolios_csv_path)
+        name_to_id = portfolios_df[['NAME', 'PORTFOLIO_ID']].dropna().drop_duplicates().set_index('NAME').to_dict()['PORTFOLIO_ID']
+        name_values = list(name_to_id.keys())
+        selected_name = st.sidebar.selectbox("Select NAME", name_values)
+
+        # Load Benchmarks.csv to get BM_NAME to BENCHMARK_ID mapping
+        benchmarks_csv_path = local_paths["Holding"][1]  # Benchmarks.csv
+        benchmarks_df = pd.read_csv(benchmarks_csv_path)
+        bm_name_to_id = benchmarks_df[['BM_NAME', 'BENCHMARK_ID']].dropna().drop_duplicates().set_index('BM_NAME').to_dict()['BENCHMARK_ID']
+        bm_name_values = list(bm_name_to_id.keys())
+        selected_bm_name = st.sidebar.selectbox("Select BM_NAME", bm_name_values)
+
+        # Load Holding.csv
+        holding_path = local_paths["Holding"][0]  # Holding.csv
+        holding_df = pd.read_csv(holding_path)
+
+        # Load Securities.csv to get SECURITY_ID values
+        securities_csv_path = local_paths["Holding"][2]  # Securities.csv
+        securities_df = pd.read_csv(securities_csv_path)
+        security_ids = securities_df['SECURITY_ID'].dropna().unique()
+
+        if selected_name and selected_bm_name:
+            # Update PORTFOLIO_ID in Holding DataFrame
+            holding_df['PORTFOLIO_ID'] = name_to_id.get(selected_name, holding_df['PORTFOLIO_ID'])
+
+            # Update BENCHMARK_ID in Holding DataFrame
+            holding_df['BENCHMARK_ID'] = bm_name_to_id.get(selected_bm_name, holding_df['BENCHMARK_ID'])
+            
+            # Text input for number of rows
+            num_rows = st.sidebar.text_input("Enter the number of rows required", value="10")
+
+            try:
+                num_rows = int(num_rows)
+            except ValueError:
+                st.sidebar.error("Please enter a valid number.")
+                num_rows = 0
+
+            metadata_file_path = local_rules["Holding"]
+            try:
+                with open(metadata_file_path, "r", encoding='utf-8') as metadata_file:
+                    metadata_json = metadata_file.read()
+                    
+                    # Auto-detect metadata for single-table setup
+                    metadata = detect_single_table_metadata(holding_df)
+                    
+                    # Apply metadata from JSON (update columns)
+                    apply_metadata_from_json(metadata, json.loads(metadata_json))
+                    
+                    if st.button("Generate Data"):
+                        with st.spinner('Processing...'):
+                            # Generate synthetic data with the number of rows equal to num_rows
+                            metadata, synthetic_data = process_single_table_Scenario(holding_df, num_rows, metadata_json)
+                            if synthetic_data is not None:
+                                synthetic_data = synthetic_data.head(num_rows)  # Ensure the number of rows matches num_rows
+                                
+                                # Randomly assign SECURITY_ID values from the Securities table
+                                synthetic_data['SECURITY_ID'] = np.random.choice(security_ids, size=num_rows, replace=True)
+                                
+                                st.write(f"Synthetic Data with {num_rows} rows:")
+                                st.dataframe(synthetic_data)
+                                
+                                # Convert DataFrame to CSV
+                                csv = convert_df(synthetic_data)
+                                st.download_button(
+                                    label="Download Synthetic Data CSV",
+                                    data=csv,
+                                    file_name="synthetic_data.csv",
+                                    mime="text/csv"
+                                )
+                                
+                                # Download Metadata JSON
+                                if metadata:
+                                    metadata_json = metadata_to_json(metadata)
+                                    st.sidebar.download_button(
+                                        label="Download Metadata JSON",
+                                        data=metadata_json,
+                                        file_name="metadata.json",
+                                        mime="application/json"
+                                    )
+            except Exception as e:
+                st.error(f"Error reading or applying metadata file {metadata_file_path}: {e}")
+
+
+
+
+
+    elif selected_scenario == "Benchmarks":
+        benchmark_provider_df = pd.read_csv(local_paths["Benchmark_Provider"])
+        bm_provider_values = benchmark_provider_df['BM_PROVIDER'].unique().tolist()
+        selected_bm_provider = st.sidebar.selectbox("Select Benchmark Provider", bm_provider_values)
+        
+        if selected_scenario:
+            scale = st.sidebar.slider("Select Scale", min_value=1, max_value=100, value=5, step=5)
+
+        use_llm = st.sidebar.radio("Select LLM Option", ("WITHOUT LLM", "LLM"))
+
+        dataframes = {}
+        for path in local_paths[selected_scenario]:
+            try:
+                df = pd.read_csv(path)
+                table_name = path.split("\\")[-1].split(".")[0]
+                dataframes[table_name] = df
+            except Exception as e:
+                st.error(f"Error reading file {path}: {e}")
+
+        benchmark_provider_df = dataframes.get("Benchmark_Provider")
+        benchmarks_df = dataframes.get("Benchmarks")
+
+        if benchmark_provider_df is not None and benchmarks_df is not None:
+            bm_ids = benchmark_provider_df[benchmark_provider_df['BM_PROVIDER'] == selected_bm_provider]['BM_PROVIDER_ID'].tolist()
+            benchmarks_df.loc[:, 'BM_PROVIDER_ID'] = bm_ids[0] if bm_ids else benchmarks_df['BM_PROVIDER_ID']
+            dataframes["Benchmarks"] = benchmarks_df
+
+        metadata_file_path = local_rules[selected_scenario]
+        try:
+            with open(metadata_file_path, "r", encoding='utf-8') as metadata_file:
+                metadata_json = metadata_file.read()
+
+                metadata = detect_single_table_metadata(dataframes["Benchmarks"])
+                apply_metadata_from_json(metadata, json.loads(metadata_json))
+
+                if st.button("Generate Data"):
+                    with st.spinner('Processing...'):
+                        if use_llm == "LLM":
+                            benchmarks_df['BM_NAME'] = benchmarks_df['BM_PROVIDER_ID'].apply(fetch_bm_name_from_llm)
+
+                            benchmarks_df = benchmarks_df.explode('BM_NAME')
+
+                            benchmarks_df['BM_NAME'] = benchmarks_df['BM_NAME'].apply(clean_bm_name)
+
+                            benchmarks_df['BM_NAME'].replace('', 'Unnamed Benchmark', inplace=True)
+
+                        benchmarks_df['BENCHMARK_ID'] = range(1, len(benchmarks_df) + 1)
+
+                        metadata, synthetic_data = process_single_table_Scenario(benchmarks_df, scale, metadata_json)
+
+                        if synthetic_data is not None:
+                            st.write("Synthetic Data:")
+                            st.dataframe(synthetic_data)
+                            csv = convert_df(synthetic_data)
+                            st.download_button(
+                                label="Download Synthetic Data CSV",
+                                data=csv,
+                                file_name="synthetic_data.csv",
+                                mime="text/csv"
+                            )
+                            if metadata:
+                                metadata_json = metadata_to_json(metadata)
+                                st.sidebar.download_button(
+                                    label="Download Metadata JSON",
+                                    data=metadata_json,
+                                    file_name="metadata.json",
+                                    mime="application/json"
+                                )
+        except Exception as e:
+            st.error(f"Error reading or applying metadata file {metadata_file_path}: {e}") 
+
+    else:
+        if selected_scenario:
+            scale = st.sidebar.slider("Select Scale", min_value=1, max_value=100, value=5, step=5)
+        try:
+            df = pd.read_csv(local_paths[selected_scenario])
             metadata_file_path = local_rules[selected_scenario]
             try:
                 with open(metadata_file_path, "r", encoding='utf-8') as metadata_file:
                     metadata_json = metadata_file.read()
                     if st.button("Generate Data"):
                         with st.spinner('Processing...'):
-                            metadata, multi_table_data = process_multi_table_Scenario(dataframes, scale, metadata_json)
-                            if multi_table_data:
-                                for table_name, data in multi_table_data.items():
-                                    st.write(f"Table: {table_name}")
-                                    st.dataframe(data)
-                                    csv = convert_df(data)
-                                    st.download_button(
-                                        label=f"Download {table_name} CSV",
-                                        data=csv,
-                                        file_name=f"{table_name}.csv",
-                                        mime="text/csv"
-                                    )
+                            metadata = detect_single_table_metadata(df)
+                            apply_metadata_from_json(metadata, json.loads(metadata_json))
+                            metadata, synthetic_data = process_single_table_Scenario(df, scale, metadata_json)
+                            if synthetic_data is not None:
+                                st.dataframe(synthetic_data)
+                                csv = convert_df(synthetic_data)
+                                st.download_button(
+                                    label="Download CSV",
+                                    data=csv,
+                                    file_name="synthetic_data.csv",
+                                    mime="text/csv"
+                                )
                                 if metadata:
                                     metadata_json = metadata_to_json(metadata)
                                     st.sidebar.download_button(
@@ -497,35 +807,5 @@ elif mode == "Scenario":
                                     )
             except Exception as e:
                 st.error(f"Error reading metadata file {metadata_file_path}: {e}")
-
-        else:
-            try:
-                df = pd.read_csv(local_paths[selected_scenario])
-                metadata_file_path = local_rules[selected_scenario]
-                try:
-                    with open(metadata_file_path, "r", encoding='utf-8') as metadata_file:
-                        metadata_json = metadata_file.read()
-                        if st.button("Generate Data"):
-                            with st.spinner('Processing...'):
-                                metadata, synthetic_data = process_single_table_Scenario(df, scale, metadata_json)
-                                if synthetic_data is not None:
-                                    st.dataframe(synthetic_data)
-                                    csv = convert_df(synthetic_data)
-                                    st.download_button(
-                                        label="Download CSV",
-                                        data=csv,
-                                        file_name="synthetic_data.csv",
-                                        mime="text/csv"
-                                    )
-                                    if metadata:
-                                        metadata_json = metadata_to_json(metadata)
-                                        st.sidebar.download_button(
-                                            label="Download Metadata JSON",
-                                            data=metadata_json,
-                                            file_name="metadata.json",
-                                            mime="application/json"
-                                        )
-                except Exception as e:
-                    st.error(f"Error reading metadata file {metadata_file_path}: {e}")
-            except Exception as e:
+        except Exception as e:
                 st.error(f"Error reading data file {local_paths[selected_scenario]}: {e}")

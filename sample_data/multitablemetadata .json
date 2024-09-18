@@ -51,7 +51,8 @@
                     "sdtype": "id"
                 },
                 "WEIGHT(%)": {
-                    "sdtype": "categorical"
+                    "computer_representation": "Float",
+                    "sdtype": "numerical"
                 },
                 "MARKET_VALUE": {
                     "computer_representation": "Float",
@@ -151,7 +152,7 @@
     "constraint_class": "FixedCombinations",
     "table_name":"Securities",
     "constraint_parameters": {
-        "column_names": ["SECTOR", "INDUSTRY"]
+    "column_names": ["SECTOR", "INDUSTRY"]
     }
    
     

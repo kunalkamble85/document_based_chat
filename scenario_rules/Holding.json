@@ -1,0 +1,28 @@
+{
+    "primary_key": "PAR",
+    "columns": {
+        "PORTFOLIO_ID": {
+            "sdtype": "categorical"
+        },
+        "BENCHMARK_ID": {
+            "sdtype": "categorical"
+        },
+        "SECURITY_ID": {
+            "sdtype": "categorical"
+        },
+        "PAR": {
+            "sdtype": "id",
+             "regex_format":"[1-9][0-9]{1,2}00"
+        },
+        "CURRENT_PRICE": {
+            "sdtype": "id",
+            "regex_format":"[1-9]{2,3}$"
+        },
+        "MARKET_VALUE": {
+            "sdtype": "numerical"
+        }
+    }
+     
+
+
+}

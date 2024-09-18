@@ -1,0 +1,21 @@
+{
+        "primary_key": "BENCHMARK_ID",
+            "columns": {
+                "BENCHMARK_ID": {
+                    "sdtype": "id"
+                },
+                "BM_NAME": {
+                    "sdtype": "categorical"
+                },
+                "BM_CODE": {
+                    "sdtype": "categorical"
+                },
+                "CURRENCY": {
+                    "sdtype": "categorical"
+                },
+                "BM_PROVIDER_ID": {
+                    "sdtype": "categorical"
+                }
+            }
+}
+       

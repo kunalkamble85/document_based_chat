@@ -14,7 +14,7 @@
             "regex_format":"[X]{6}[1-9]{4}$"
         },
         "EMAIL": {
-            "sdtype": "email"
+            "sdtype": "free_email"
         },
         "ADDRESS": {
             "sdtype": "address"
