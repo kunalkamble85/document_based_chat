@@ -4,13 +4,15 @@
             "sdtype": "id"
         },
         "TICKER": {
-            "sdtype": "categorical"
+            "sdtype": "id",
+            "regex_format": "[A-Z]{3,10}$"
         },
         "NAME": {
-            "sdtype": "categorical"
+            "sdtype": "id",
+            "regex_format": "[A-Z]{30,100}$"
         },
         "DESCRIPTION": {
-            "sdtype": "categorical"
+            "sdtype": "paragraph"
         },
         "CURRENCY": {
             "sdtype": "categorical"

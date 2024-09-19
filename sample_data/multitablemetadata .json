@@ -10,10 +10,10 @@
                     "sdtype": "categorical"
                 },
                 "SHORT_DESCRIPTION": {
-                    "sdtype": "categorical"
+                    "sdtype": "sentence"
                 },
                 "DESCRITPION": {
-                    "sdtype": "categorical"
+                    "sdtype": "paragraph"
                   
                 }
             }

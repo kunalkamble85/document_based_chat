@@ -3,6 +3,7 @@ import pandas as pd
 import zipfile
 import numpy as np
 import json
+import re
 from sdv.single_table import GaussianCopulaSynthesizer
 from sdv.multi_table import HMASynthesizer
 from sdv.metadata import SingleTableMetadata, MultiTableMetadata
@@ -10,6 +11,7 @@ from sdv.utils import drop_unknown_references
 import google.generativeai as genai
 
 # Set up Google Gemini Pro API key and model
+
 model = genai.GenerativeModel("gemini-pro")
 
 st.set_page_config(page_title="Synthetic Data Generation", page_icon=":book:", layout="wide")
@@ -337,38 +339,53 @@ def convert_df(df):
 
 
 
+generated_benchmark_names = set()
+
 def fetch_bm_name_from_llm(bm_provider_id):
     try:
-        # Convert bm_provider_id to string
         bm_provider_id_str = str(bm_provider_id)
+        unique_benchmark_names = []
+        max_retries = 10  # Limit to 10 attempts for unique names
+        
+        while len(unique_benchmark_names) < 5:  # Change this to however many unique names you want
+            response = model.generate_content(
+                'Generate unique and distinctive names for benchmarks that do not repeat like S&P 500 Index, S&P 500 Growth Index:',
+                generation_config=genai.GenerationConfig(
+                    temperature=0.1,
+                )
+            )
 
-        # Generate content using model.generate_content with proper arguments
-        response = model.generate_content(
-            'Generate unique and distinctive names for benchmarks that do not repeat like S&P 500 Index,S&P 500 Growth Index  : ',
-            generation_config=genai.GenerationConfig(temperature=0.1)
-        )
+            generated_text = ''
+            if response and hasattr(response, 'candidates') and len(response.candidates) > 0:
+                generated_text = response.candidates[0].content.parts[0].text.strip()
 
-        # Print the full response for debugging
-        # st.write(f"LLM Response for BM_PROVIDER_ID {bm_provider_id}: {response}")
+            benchmark_names = generated_text.split("\n")
+            benchmark_names = [name.split('. ', 1)[-1].strip() for name in benchmark_names if name.strip()]
 
-        # Extract the generated text from the nested response (candidates -> content -> parts -> text)
-        generated_text = ''
-        if response and hasattr(response, 'candidates') and len(response.candidates) > 0:
-            generated_text = response.candidates[0].content.parts[0].text.strip()
+            for name in benchmark_names:
+                if name not in generated_benchmark_names:
+                    unique_benchmark_names.append(name)
+                    generated_benchmark_names.add(name)
 
-        # Split the generated text into lines and remove numbering (e.g., '1. ', '2. ')
-        benchmark_names = generated_text.split("\n")
-        benchmark_names = [name.split('. ', 1)[-1].strip() for name in benchmark_names if name.strip()]
+            if len(unique_benchmark_names) >= 1:  # Change this according to your needs
+                break
+            
+            max_retries -= 1
+            if max_retries == 0:
+                st.warning(f"Could not generate enough unique names for BM_PROVIDER_ID: {bm_provider_id}")
+                break
 
-        if not benchmark_names:
+        if not unique_benchmark_names:
             st.warning(f"BM_NAME not generated for BM_PROVIDER_ID: {bm_provider_id}")
-            benchmark_names = ["S&P 500 Multicap Index"]  # Provide a default value if empty
+            unique_benchmark_names = ["S&P 500 Multicap Index"]  # Default value if empty
 
-        return benchmark_names
+        return unique_benchmark_names
 
     except Exception as e:
         st.error(f"Error fetching BM_NAME from LLM: {e}")
         return ["Error in BM_NAME generation"]
+
+
 
 def clean_bm_name(name):
     # Remove any characters like -, *, and strip leading/trailing whitespace
@@ -707,17 +724,18 @@ if mode == "Scenario":
         benchmark_provider_df = pd.read_csv(local_paths["Benchmark_Provider"])
         bm_provider_values = benchmark_provider_df['BM_PROVIDER'].unique().tolist()
         selected_bm_provider = st.sidebar.selectbox("Select Benchmark Provider", bm_provider_values)
-        
-        if selected_scenario:
-            scale = st.sidebar.slider("Select Scale", min_value=1, max_value=100, value=5, step=5)
 
         use_llm = st.sidebar.radio("Select LLM Option", ("WITHOUT LLM", "LLM"))
+
+        # Only show scale slider if "WITHOUT LLM" is selected
+        if use_llm == "WITHOUT LLM":
+            scale = st.sidebar.slider("Select Scale", min_value=1, max_value=100, value=5, step=5, key="scale_without_llm")
 
         dataframes = {}
         for path in local_paths[selected_scenario]:
             try:
                 df = pd.read_csv(path)
-                table_name = path.split("\\")[-1].split(".")[0]
+                table_name = path.split("/")[-1].split(".")[0]
                 dataframes[table_name] = df
             except Exception as e:
                 st.error(f"Error reading file {path}: {e}")
@@ -730,7 +748,14 @@ if mode == "Scenario":
             benchmarks_df.loc[:, 'BM_PROVIDER_ID'] = bm_ids[0] if bm_ids else benchmarks_df['BM_PROVIDER_ID']
             dataframes["Benchmarks"] = benchmarks_df
 
-        metadata_file_path = local_rules[selected_scenario]
+        # Directly specify the metadata file paths based on LLM option
+        import os 
+        cwd = os.getcwd()
+        print(cwd)
+        if use_llm == "LLM":            
+            metadata_file_path = "./scenario_rules/LLM_BM_Rule.json"
+        else:  
+            metadata_file_path = "./scenario_rules/Benchmarks.json"  
         try:
             with open(metadata_file_path, "r", encoding='utf-8') as metadata_file:
                 metadata_json = metadata_file.read()
@@ -741,38 +766,71 @@ if mode == "Scenario":
                 if st.button("Generate Data"):
                     with st.spinner('Processing...'):
                         if use_llm == "LLM":
+                          
                             benchmarks_df['BM_NAME'] = benchmarks_df['BM_PROVIDER_ID'].apply(fetch_bm_name_from_llm)
-
                             benchmarks_df = benchmarks_df.explode('BM_NAME')
-
                             benchmarks_df['BM_NAME'] = benchmarks_df['BM_NAME'].apply(clean_bm_name)
-
                             benchmarks_df['BM_NAME'].replace('', 'Unnamed Benchmark', inplace=True)
 
-                        benchmarks_df['BENCHMARK_ID'] = range(1, len(benchmarks_df) + 1)
+               
+                            benchmarks_df['BENCHMARK_ID'] = range(1, len(benchmarks_df) + 1)
 
-                        metadata, synthetic_data = process_single_table_Scenario(benchmarks_df, scale, metadata_json)
+                       
+                            metadata, synthetic_data = process_single_table_Scenario(benchmarks_df, 100, metadata_json)
 
-                        if synthetic_data is not None:
-                            st.write("Synthetic Data:")
-                            st.dataframe(synthetic_data)
-                            csv = convert_df(synthetic_data)
-                            st.download_button(
-                                label="Download Synthetic Data CSV",
-                                data=csv,
-                                file_name="synthetic_data.csv",
-                                mime="text/csv"
-                            )
-                            if metadata:
-                                metadata_json = metadata_to_json(metadata)
-                                st.sidebar.download_button(
-                                    label="Download Metadata JSON",
-                                    data=metadata_json,
-                                    file_name="metadata.json",
-                                    mime="application/json"
+                            if synthetic_data is not None and isinstance(synthetic_data, pd.DataFrame):
+                                # Keep unique rows based on BM_NAME
+                                synthetic_data_unique = synthetic_data.drop_duplicates(subset='BM_NAME')
+
+                                st.write("Synthetic Data :")
+                                st.dataframe(synthetic_data_unique)
+
+                                # Download unique rows
+                                csv = convert_df(synthetic_data_unique)
+                                st.download_button(
+                                    label="Download Synthetic Data CSV",
+                                    data=csv,
+                                    file_name="synthetic_data.csv",
+                                    mime="text/csv"
                                 )
+                                if metadata:
+                                    metadata_json = metadata_to_json(metadata)
+                                    st.sidebar.download_button(
+                                        label="Download Metadata JSON",
+                                        data=metadata_json,
+                                        file_name="metadata.json",
+                                        mime="application/json"
+                                    )
+                        else:  # Handle "WITHOUT LLM" option
+                            # Process data as needed for the "WITHOUT LLM" case
+                            metadata, synthetic_data_without_llm = process_single_table_Scenario(benchmarks_df, scale, metadata_json)
+
+                            if synthetic_data_without_llm is not None and isinstance(synthetic_data_without_llm, pd.DataFrame):
+                                st.write("Synthetic Data:")
+                                st.dataframe(synthetic_data_without_llm.head(100))
+
+                                # Download all rows based on the scale
+                                csv_without_llm = convert_df(synthetic_data_without_llm)
+                                st.download_button(
+                                    label="Download Synthetic Data CSV ",
+                                    data=csv_without_llm,
+                                    file_name="synthetic_data_without_llm.csv",
+                                    mime="text/csv"
+                                )
+                                if metadata:
+                                    metadata_json = metadata_to_json(metadata)
+                                    st.sidebar.download_button(
+                                        label="Download Metadata JSON ",
+                                        data=metadata_json,
+                                        file_name="metadata_without_llm.json",
+                                        mime="application/json"
+                                    )
         except Exception as e:
-            st.error(f"Error reading or applying metadata file {metadata_file_path}: {e}") 
+            st.error(f"Error reading or applying metadata file {metadata_file_path}: {e}")
+
+
+
+
 
     else:
         if selected_scenario:

@@ -5,8 +5,7 @@
             "sdtype": "id"
         },
         "BM_NAME": {
-            "sdtype": "id",
-            "regex_format": "[A-Z]{10,100}$"
+            "sdtype": "categorical"
         },
         "BM_CODE": {
             "sdtype": "id",

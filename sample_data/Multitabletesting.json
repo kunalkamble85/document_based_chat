@@ -11,11 +11,10 @@
                     "regex_format": "[A-Z]{5,7}$"
                 },
                 "SHORT_DESCRIPTION": {
-                    "sdtype": "id",
-                    "regex_format": "[A-Z]{5,7}$"
+                    "sdtype": "sentence"
                 },
                 "DESCRITPION": {
-                    "sdtype": "categorical"
+                    "sdtype": "paragraph"
                 }
             }
         },

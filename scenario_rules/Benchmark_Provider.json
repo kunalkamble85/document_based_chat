@@ -1,17 +1,18 @@
- {
+{
     "primary_key": "BM_PROVIDER_ID",
     "columns": {
         "BM_PROVIDER_ID": {
             "sdtype": "id"
         },
         "BM_PROVIDER": {
-            "sdtype": "categorical"
+            "sdtype": "id",
+            "regex_format": "[A-Z]{4,20}$"
         },
         "SHORT_DESCRIPTION": {
-            "sdtype": "categorical"
+            "sdtype": "sentence"
         },
         "DESCRITPION": {
-            "sdtype": "categorical"
+            "sdtype": "paragraph"
             
         }
     }
