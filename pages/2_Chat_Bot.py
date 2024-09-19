@@ -1,5 +1,5 @@
 import streamlit as st
-from langchain.chains import ConversationChain
+from langchain_community.chat_models import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from PIL import Image
 
@@ -8,8 +8,13 @@ st.title("🤖 Chat with AI")
 
 
 def user_input(user_question):
-    llm = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
-    output = llm.invoke(user_question)
+    if st.session_state.LLM_MODEL == "gpt-4o-mini":
+        print("Calling Open AI model")
+        model = ChatOpenAI(model="gpt-4o-mini", max_tokens="200")
+    else:
+        print("Calling Google Palm")
+        model = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
+    output = model.invoke(user_question)
     return output.content
 
 if "chat_messages" not in st.session_state:

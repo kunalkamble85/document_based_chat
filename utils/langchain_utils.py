@@ -10,6 +10,7 @@ from sdv.lite import SingleTablePreset
 import pandas as pd
 import streamlit as st
 from langchain.chains import ConversationChain
+from langchain_community.chat_models import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 import kuzu
 
@@ -187,8 +188,15 @@ def generate_tests_using_google(input, option):
         prompt = get_test_case_for_code(input)
     else:
         prompt = get_test_case_for_use_case(input)
-    llm = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
-    qa_chain = ConversationChain(llm=llm)
+    
+    if st.session_state.LLM_MODEL == "gpt-4o-mini":
+        print("Calling Open AI model")
+        model = ChatOpenAI(model="gpt-4o-mini", max_tokens="200")
+    else:
+        print("Calling Google Palm")
+        model = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
+
+    qa_chain = ConversationChain(llm=model)
     output = qa_chain.invoke(prompt)
     print(output)
     if "response" in output:
@@ -204,8 +212,14 @@ def process_source_code(input, option, source_language, target_language):
     else:
         prompt = get_prompt_for_code_generation(input, source_language)
 
-    llm = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.5)
-    qa_chain = ConversationChain(llm=llm)
+    if st.session_state.LLM_MODEL == "gpt-4o-mini":
+        print("Calling Open AI model")
+        model = ChatOpenAI(model="gpt-4o-mini", max_tokens="200")
+    else:
+        print("Calling Google Palm")
+        model = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
+    
+    qa_chain = ConversationChain(llm=model)
     output = qa_chain.invoke(prompt)
     print(output)
     if "response" in output:
@@ -219,8 +233,14 @@ def process_source_code(input, option, source_language, target_language):
 
 def summarize_document(text, max_tokens):
     prompt = get_prompt_summary_task(text, max_tokens)
-    llm = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
-    qa_chain = ConversationChain(llm=llm)
+    if st.session_state.LLM_MODEL == "gpt-4o-mini":
+        print("Calling Open AI model")
+        model = ChatOpenAI(model="gpt-4o-mini", max_tokens="200")
+    else:
+        print("Calling Google Palm")
+        model = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
+    
+    qa_chain = ConversationChain(llm=model)
     output = qa_chain.invoke(prompt)
     print(output)
     if "response" in output:
