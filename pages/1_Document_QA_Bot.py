@@ -25,9 +25,12 @@ embeddings = st.session_state.embeddings
 st.title("🤖 Q&A using documents")
 
 def get_prompt_template(question, context):
-    prompt_template = """You are Document Q&A or Summarizer buddy. Give answer or summary to the questions solely from only provided text also your response should be in bullets or points and language must be English only.
-    if you can't find the answer in the text you must say you don't know. You must ignore any information that is not relevent to the question. Do not give any general answers apart from text provided.
-    Give short answers for the questions.
+    prompt_template = """
+    You are Document Q&A or Summarizer expert. 
+    Give short answers for the questions in English.
+    Give answer or summary to the questions solely from only provided Text.
+    Do not give any general answers apart from Text provided.
+    if you can't find the answer in the provided Text just say 'I don't know'. 
     question:\{question}\nText:{context}
     """
 
