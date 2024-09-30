@@ -73,7 +73,7 @@ model_name = st.radio(
 #     'Select LLM Model',
 #     ('Google Palm','Mistral', 'Google Gemini', 'Claude Sonnet', 'llama', 'ChatGPT'))
 
-st.markdown(''':red[Only Google gemini prod and Open AI's gpt4o-mini model are avaiable right now.]''')
+st.markdown(''':red[All models are served by Oracle Gen AI services]''')
 
 temprature = st.slider("Set the model temprature", min_value=0.0, max_value=1.0, value=0.1, step=0.1)
 
