@@ -9,12 +9,12 @@ def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
 
-how_select = st.radio("How would you like to provide input for User Story Generation?", ["Upload File","Piece of input", ], horizontal=True)
+how_select = st.radio("How would you like to provide input for User Story Generation?", ["Piece of input", "Upload File"], horizontal=True)
 
 documents =None
 user_input =None
 if how_select == "Piece of input":
-   user_input = st.text_area("or Insert your code or use Case", height= 200)
+   user_input = st.text_area("or Insert your code or use Case", value="Generate user stories to read csv file as input, tranform data and save into Oracle database", height= 200)
 else:
    documents = st.file_uploader(label="Choose a BRD file", type=["doc","txt"])
 
@@ -27,3 +27,5 @@ if button:
             output = generate_user_stories(user_input)
             st.write("Click below button to download user stories generated.")
             st.download_button('Download User Stories', output, "user_stories.txt")
+            # st.code(output, language="python", line_numbers=False)    
+            st.markdown(f"""<p style="background-color: #DEDDDD">{output}</p>""", unsafe_allow_html=True)    

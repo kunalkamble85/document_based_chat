@@ -27,7 +27,8 @@ if button:
         if text!=None and text!="":
             output = summarize_document(text, max_tokens)
             st.write("Click below button to download summary generated.")
-            st.download_button('Download Summary', output, "summary.txt")
-            st.success('Successfully processed!')
+            st.download_button('Download Summary', output, "summary.txt")            
+            st.success('Successfully processed. Below is the required summary.')
+            st.markdown(f"""<p style="background-color: #DEDDDD">{output}</p>""", unsafe_allow_html=True)
         else:
             st.error('Error while processing input!')

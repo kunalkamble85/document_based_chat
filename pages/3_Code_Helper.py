@@ -1,8 +1,8 @@
 import streamlit as st
 from utils.langchain_utils import process_source_code
 
-source = {"c":"C", "cobol":"COBOL", "java":"Java","php":"PHP","python":"Python","r":"R","js":"JavaScript","angularJS":"angularJS","reactJS":"reactJS"}
-target = {"python":"Python","java":"Java","php":"PHP","r":"R","js":"JavaScript", "reactJS":"reactJS", "angularJS":"angularJS"}
+source = {"python":"Python", "java":"Java", "c":"C", "cobol":"COBOL", "php":"PHP","r":"R","js":"JavaScript","angularJS":"angularJS","reactJS":"reactJS"}
+target = {"java":"Java","python":"Python","php":"PHP","r":"R","js":"JavaScript", "reactJS":"reactJS", "angularJS":"angularJS"}
 languages_extensions = {"java":".java","php":".php","python":".py","r":".R","js":".js", "c":".c", "cobol":".txt", "reactJS":".js","angularJS":".js"}
 
 
@@ -19,7 +19,7 @@ how_select = None
 input_text = None
 target_lang = None
 if task == "Generate Code":
-    input_text = st.text_area("Insert your requirment here to generate code", height= 200)
+    input_text = st.text_area(label="Insert your requirment here to generate code", value="write a program to sort list of numbers", height= 200)
     target_lang = source_lang
 else:    
     if task == "Convert Code":
@@ -31,7 +31,7 @@ else:
     how_select = st.radio("How would you like to do?", ["Upload Source File","Piece of Code", ], horizontal=True)
 
     if how_select == "Piece of Code":
-        code_text = st.text_area("Insert your code", height= 200)
+        code_text = st.text_area("Insert your code", value="print('Hello')", height= 200)
     else:
         documents = st.file_uploader(label="Choose a source file")
 
@@ -54,6 +54,7 @@ if button:
         if task == "Explain Code":
             target_file_name = "code_documentation.txt"
         else:
-            target_file_name = f"{file_name.split('.')[0]}{languages_extensions.get(target_lang)}"
+            target_file_name = f"{file_name.split('.')[0]}{languages_extensions.get(target_lang)}"        
         st.download_button('Download output', output, target_file_name)
-        st.success('Successfully processed!')
+        st.success('Successfully processed. Below is the code snippet.')
+        st.code(output, language=target_lang, line_numbers=False)
