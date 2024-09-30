@@ -59,11 +59,11 @@ def search_text_fs(question, filename):
     print(results)
     for doc, score in results:
         if score < 0.99:
-            data.append(f"""filename: {i.metadata.get('filename')}, content: {i.page_content}""")
+            data.append(f"""filename: {doc.metadata.get('filename')}, content: {doc.page_content}""")
     with st.expander("Check Source Documents"):
         if len(data)>0:
-            for i in data:
-                st.info(i)
+            for entry in data:
+                st.info(entry)
         else:
             st.info("No Source Found")
     return data
