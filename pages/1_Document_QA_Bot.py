@@ -53,9 +53,9 @@ def search_text_fs(question, filename):
     vectordb.index.distance_measure = "cosine"
 
     if filename == ["All"]:
-        results = vectordb.similarity_search_with_score(query=question, k=10)
+        results = vectordb.similarity_search_with_score(query=question, k=num_results)
     else:
-        results = vectordb.similarity_search_with_score(query=question, k=10, filter={"filename":filename})
+        results = vectordb.similarity_search_with_score(query=question, k=num_results, filter={"filename":filename})
     print(results)
     for doc, score in results:
         if score < 0.99:
@@ -240,6 +240,7 @@ else:
     else:
         default = None
     files = st.multiselect("Choose File for Q&A", options=fileslist, label_visibility="hidden", placeholder="Choose File for Q&A", default=default)
+    num_results = st.slider(label="Select chunk limit", min_value=5, max_value=20, value=10, step=5)
     if files:
         for message in st.session_state["doc_messages"]:
             # with st.chat_message(message["role"]):
