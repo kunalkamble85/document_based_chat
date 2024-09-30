@@ -33,6 +33,7 @@ def get_prompt_template(question, context):
     if you can't find the answer in the provided Text just say 'I don't know'. 
     question:\{question}\nText:{context}
     """
+    return prompt_template
 
 # print(os.name)
 if os.name == "nt":
@@ -73,7 +74,9 @@ def user_input(user_question, files):
     docs = search_text_fs(user_question, files)
     prompt = get_prompt_template(user_question, docs)
     chat_history = st.session_state["chat_history"]
-    response = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, chat_history)
+    messages = chat_history[:-1]
+    messages.append({"role":"user", "content": prompt})
+    response = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, messages)
     return response
 
 if "conversation" not in st.session_state:
