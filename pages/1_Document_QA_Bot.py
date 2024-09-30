@@ -25,7 +25,7 @@ embeddings = st.session_state.embeddings
 st.title("🤖 Q&A using documents")
 
 def get_prompt_template(question, context):
-    prompt_template = """
+    prompt_template = f"""
     You are Document Q&A or Summarizer expert. 
     Give short answers for the questions in English.
     Give answer or summary to the questions solely from only provided Text.
@@ -49,7 +49,7 @@ def is_file_processed(filename):
 def search_text_fs(question, filename):
     vectordb = FAISS.load_local(os.path.join(
         DATA_DIR, "faiss_index"), embeddings, allow_dangerous_deserialization = True, distance_strategy = DistanceStrategy.COSINE)
-    data =[]
+    data = []
     vectordb.index.distance_measure = "cosine"
 
     if filename == ["All"]:
@@ -59,25 +59,27 @@ def search_text_fs(question, filename):
     print(results)
     for doc, score in results:
         if score < 0.99:
-            data.append(doc)
+            data.append(f"""filename: {i.metadata.get('filename')}, content: {i.page_content}""")
     with st.expander("Check Source Documents"):
         if len(data)>0:
             for i in data:
-                st.info(f"""{i.metadata.get('filename')}
-                        {i.page_content}""")
+                st.info(i)
         else:
             st.info("No Source Found")
-            data = [Document(page_content="No Source", metadata={"filename":"None"})]
     return data
 
 def user_input(user_question, files):
     docs = search_text_fs(user_question, files)
-    prompt = get_prompt_template(user_question, docs)
-    chat_history = st.session_state["chat_history"]
-    messages = chat_history[:-1]
-    messages.append({"role":"user", "content": prompt})
-    response = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, messages)
-    return response
+    if len(docs)>0:
+        prompt = get_prompt_template(user_question, docs)
+        chat_history = st.session_state["chat_history"]
+        messages = chat_history[:-1]
+        messages.append({"role":"user", "content": prompt})
+        response = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, messages)
+        return response
+    else:
+        return "I don't know"
+    
 
 if "conversation" not in st.session_state:
     st.session_state.conversation = None

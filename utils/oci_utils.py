@@ -40,8 +40,8 @@ def handle_llama_model_request(model, messages):
     chat_request = oci.generative_ai_inference.models.GenericChatRequest()
     chat_request.api_format = oci.generative_ai_inference.models.BaseChatRequest.API_FORMAT_GENERIC
     chat_request.messages = all_oci_messages
-    chat_request.max_tokens = 600
-    chat_request.temperature = 1
+    chat_request.max_tokens = 4000
+    chat_request.temperature = 0.1
     chat_request.frequency_penalty = 0
     chat_request.presence_penalty = 0
     chat_request.top_p = 0.75
@@ -69,8 +69,8 @@ def handle_cohore_model_request(model, messages):
     
     chat_request = oci.generative_ai_inference.models.CohereChatRequest()
     chat_request.message = user_last_message
-    chat_request.max_tokens = 600
-    chat_request.temperature = 0.25
+    chat_request.max_tokens = 4000
+    chat_request.temperature = 0.1
     chat_request.frequency_penalty = 0
     chat_request.top_p = 0.75
     chat_request.top_k = 0
