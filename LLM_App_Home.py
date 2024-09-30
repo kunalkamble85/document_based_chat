@@ -33,8 +33,9 @@ with st.sidebar:
             [data-testid="stSidebarNav"] {{
                 background-image: {logo};
                 background-repeat: no-repeat;
-                padding-top: 150px;
+                padding-top: 180px;
                 background-size: 290px 120px;
+                background-position: 20px 20px;
             }}
         </style>
         """,
