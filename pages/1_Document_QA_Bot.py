@@ -31,7 +31,7 @@ def get_prompt_template(question, context):
     Give answer or summary to the questions solely from only provided Text.
     Do not give any general answers apart from Text provided.
     if you can't find the answer in the provided Text just say 'I don't know'. 
-    question:\{question}\nText:{context}
+    \nText:{context}\n Question:\{question}
     """
     return prompt_template
 
