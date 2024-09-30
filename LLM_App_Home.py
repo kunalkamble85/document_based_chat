@@ -11,6 +11,20 @@ from pathlib import Path
 
 st.set_page_config(page_title="🤖 LLM Home", page_icon=":book:", layout="wide")
 
+custom_css = """
+<style>
+    [data-testid=stSidebar] {
+        background-color: #DEDDDD !important;
+    }
+</style>
+"""
+# Apply custom CSS
+st.markdown(custom_css, unsafe_allow_html=True)
+
+# Streamlit app content, including the sidebar
+with st.sidebar:
+    pass
+
 with st.sidebar:
     logo = f"url(data:image/png;base64,{base64.b64encode(Path('./images/oracle_logo.jpg').read_bytes()).decode()})"
     st.markdown(
@@ -19,7 +33,8 @@ with st.sidebar:
             [data-testid="stSidebarNav"] {{
                 background-image: {logo};
                 background-repeat: no-repeat;
-                padding-top: 200px;
+                padding-top: 120px;
+                background-size: 290px 120px;
                 background-position: 20px 20px;
             }}
         </style>
@@ -28,7 +43,13 @@ with st.sidebar:
     )
 
 with st.sidebar:
-   st.write("""<div style="width:100%;text-align:left">
+    st.write("""<div style="width:100%;text-align:left">
+            <br style="font-size: 1em;"><b>Powered by</b>
+            <br style="font-size: 3em; font-weight: bold;"><b><u>OCI Generative AI</u></b>    
+            </div>      
+            """, unsafe_allow_html=True)
+      
+    st.write("""<div style="width:100%;text-align:left">
             <br style="font-size: 1em;"><b>Built by</b>
             <br style="font-size: 3em; font-weight: bold;"><b><u>Finergy AI Team</u></b>    
             </div>      
