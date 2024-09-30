@@ -58,7 +58,7 @@ def search_text_fs(question, filename):
         results = vectordb.similarity_search_with_score(query=question, k=num_results, filter={"filename":filename})
     print(results)
     for doc, score in results:
-        if score < 0.99:
+        if score < 0.99 or True:
             data.append(f"""filename: {doc.metadata.get('filename')}, content: {doc.page_content}""")
     with st.expander("Check Source Documents"):
         if len(data)>0:
