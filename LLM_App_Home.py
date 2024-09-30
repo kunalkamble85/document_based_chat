@@ -36,17 +36,17 @@ with st.sidebar:
 
 st.title("🤖 Welcome to Oracle Finergy LLM Demo")
 
-cloud_models = {"GCP":['Gemini Pro'],"OCP":["Cohore"],"AWS":['Claude Sonnet'],"OpenAI":['gpt-4o-mini']}
-
+cloud_models = {"OCP":["meta.llama3.1-70b","meta.llama3-70b","cohore.command-r-plus","cohore.command-r-16k"],"GCP":['Gemini Pro'],"AWS":['Claude Sonnet'],"OpenAI":['gpt-4o-mini']}
+st.session_state.LLM_MODEL = "meta.llama3.1-70b"
 userid = st.text_input("Enter your user id.")
 print(f"Loging sucussful:{userid}")
-cloud_provider = st.radio(
-    "Choose your model provider",
-    ["GCP", "OCP","AWS", "OpenAI"],
-    captions = ["Google Cloud Provider", "Oracle Cloud Provider", "Amazon Web Services", "Azure Cloud Provder"], horizontal=True)
-
+# cloud_provider = st.radio(
+#     "Choose your model provider",
+#     ["GCP", "OCP","AWS", "OpenAI"],
+#     captions = ["Google Cloud Provider", "Oracle Cloud Provider", "Amazon Web Services", "Azure Cloud Provder"], horizontal=True)
+cloud_provider = "OCP"
 model_name = st.radio(
-    "Select LLM Model", cloud_models.get(cloud_provider), horizontal=True)
+    "Select OCI Generative AI Model", cloud_models.get(cloud_provider), horizontal=True)
 
 # model_name = st.selectbox(
 #     'Select LLM Model',

@@ -1,106 +1,81 @@
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.document_loaders import PyPDFLoader, TextLoader, Docx2txtLoader, CSVLoader, UnstructuredExcelLoader
+from langchain_community.document_loaders import PyPDFLoader, TextLoader, Docx2txtLoader
 import traceback
 import tempfile
 import os
-from langchain_core.prompts import (PromptTemplate)
 from sdv.metadata import SingleTableMetadata
 from sdv.lite import SingleTablePreset
 import pandas as pd
 import streamlit as st
-from langchain.chains import ConversationChain
-from langchain_community.chat_models import ChatOpenAI
-from langchain_google_genai import ChatGoogleGenerativeAI
 import kuzu
-
-def get_prompt_template():
-    template = """
-        You are helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.
-        Use the given Context and History enclosed with backticks to answer the question at the end.
-        Don't try to make up an answer, if you don't know, just say that you don't know.
-
-        Chat History:
-        {chat_history}
-
-        Context: 
-        {context}
-
-        Follow Up Input: {question}
-        Standalone question or instruction:
-        """
-    return PromptTemplate(template=template, input_variables=["chat_history", "context", "question"])
-
+from utils.oci_utils import *
 
 def get_test_case_for_code(user_input):
     template = f"""
-        <s>[INST]
         You are an expert programmer and you know how to write test cases in any programming languages. 
         In user_input, I would be providing you the source code function. 
         Analyze the source code and generate test cases in same programming language.  
         Do not include my question in your answer.
         {user_input}
-        [/INST]
         """
     return template
 
 def get_test_case_for_use_case(user_input):
     template = f"""
-        <s>[INST]
         You are an expert programmer and you know how to write test cases in any programming languages. 
         In user_input, I would be providing you the business use case. 
         Understand the context of use case and generate higher level test cases.  
         Do not include my question in your answer.
         {user_input}
-        [/INST]
+        """
+    return template
+
+def get_generate_user_stories_prompt(user_input):
+    template = f"""
+        You are an certified product owner of Agile Scrum methodology and you know how to write perfect User Story for Agile Scrum process. 
+        In user_input, I would be providing you the Buiness Use Case. 
+        Understand the context of use case and generate detailed level user stories.
+        Buiness Use Case:
+        {user_input}
         """
     return template
 
 
 def get_prompt_for_code_conversion(input, source_language, target_language):
     template = f"""
-        <s>[INST]
         You are an expert programmer of {source_language} and {target_language} programming languages. 
         In user_input, I would be providing you the source code. 
         Analyze the {source_language} source code and convert the code into {target_language}.  
         Generate proper comments for the code. 
         Generate the unit test cases for the code generated.
         {input}
-        [/INST]
         """
     return template
 
 def get_prompt_for_code_generation(input, source_language):
     template = f"""
-        <s>[INST]
         You are an expert programmer of {source_language}. 
         Generate code in {source_language} language for below input.  
         Generate proper comments for the code. 
         Generate the unit test cases for the code generated.
         {input}
-        [/INST]
         """
     return template
 
 def get_prompt_for_code_explain(input, source_language):
     template = f"""
-        <s>[INST]
         You are an expert programmer of {source_language} programming language. 
         In user_input, I would be providing you the source code. 
         Analyze the {source_language} source code and explain the code line by line.
         do not include code into the explaination.
         {input}
-        [/INST]
         """
     return template
 
 def get_prompt_summary_task(input, max_tokens):
     template = f"""
-        <s>[INST]
         You are helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.
         Use the given text below and generate the summary with {max_tokens} words.
         {input}
-        [/INST]
         """
     return template
 
@@ -154,54 +129,19 @@ def get_text_from_documents(file):
         print(f"Error while loading file: {file}")    
     return text
 
-import requests
-
-def get_test_cases(input, option):
-    API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
-    headers = {"Authorization": f"Bearer {os.getenv('HUGGINGFACEHUB_API_TOKEN')}"}
-
-    if option == "Code":
-        prompt = get_test_case_for_code(input)
-    else:
-        prompt = get_test_case_for_use_case(input)
-    
-    print(prompt)
-    
-    payload = {
-                "inputs": prompt,
-                "parameters": {"temperature": 0.8}
-            }
-    response = requests.post(API_URL, headers=headers, json=payload)
-    output = response.json()   
-    print("---------------------------------------------------")
-    print(output)
-    print("---------------------------------------------------")
-    text = output[0]["generated_text"]
-    if "```" in text:
-        return "\t" + text.split("```")[-1].strip()
-    elif "[/INST]" in text:
-        return "\t" + text.split("[/INST]")[-1].strip()
-    return text
 
 def generate_tests_using_google(input, option):
     if option == "Code":
         prompt = get_test_case_for_code(input)
     else:
         prompt = get_test_case_for_use_case(input)
-    
-    if st.session_state.LLM_MODEL == "gpt-4o-mini":
-        print("Calling Open AI model")
-        model = ChatOpenAI(model="gpt-4o-mini", max_tokens="200")
-    else:
-        print("Calling Google Palm")
-        model = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
+    output = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, [{"role":"user", "content": prompt}])
+    return output
 
-    qa_chain = ConversationChain(llm=model)
-    output = qa_chain.invoke(prompt)
-    print(output)
-    if "response" in output:
-        return output["response"]
-    return "Not able to fetch test cases."
+def generate_user_stories(input):
+    prompt = get_generate_user_stories_prompt(input)
+    output = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, [{"role":"user", "content": prompt}])
+    return output
 
 
 def process_source_code(input, option, source_language, target_language):
@@ -211,42 +151,26 @@ def process_source_code(input, option, source_language, target_language):
         prompt = get_prompt_for_code_explain(input, source_language)
     else:
         prompt = get_prompt_for_code_generation(input, source_language)
-
-    if st.session_state.LLM_MODEL == "gpt-4o-mini":
-        print("Calling Open AI model")
-        model = ChatOpenAI(model="gpt-4o-mini", max_tokens="200")
-    else:
-        print("Calling Google Palm")
-        model = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
     
-    qa_chain = ConversationChain(llm=model)
-    output = qa_chain.invoke(prompt)
-    print(output)
-    if "response" in output:
-        response = output["response"]
-        response = response.replace("```","") 
-        if target_language is not None:
-            response = response.replace(target_language,"")
-        return response
-    return "Not able to convert/explain code."
+    response = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, [{"role":"user", "content": prompt}])
+    response = response.replace("```","") 
+    if target_language is not None:
+        response = response.replace(target_language,"")
+    return response
 
 
 def summarize_document(text, max_tokens):
     prompt = get_prompt_summary_task(text, max_tokens)
-    if st.session_state.LLM_MODEL == "gpt-4o-mini":
-        print("Calling Open AI model")
-        model = ChatOpenAI(model="gpt-4o-mini", max_tokens="200")
-    else:
-        print("Calling Google Palm")
-        model = ChatGoogleGenerativeAI(model="gemini-pro", temprature = 0.1)
-    
-    qa_chain = ConversationChain(llm=model)
-    output = qa_chain.invoke(prompt)
-    print(output)
-    if "response" in output:
-        return output["response"]
-    return "Not able to get summary."
+    response = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, [{"role":"user", "content": prompt}])
+    return response
 
+def generate_synthetic_data(num_of_records):
+    prompt = f"""
+    You an Asset Manager, and you need to generate fake data which look like real data for benchamark names.
+    Generate unique and distinctive benchmark names like S&P 500 Index and S&P 500 Growth Index. 
+    Generate {num_of_records+5} names like that and do not give any category to it"""
+    response = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, [{"role":"user", "content": prompt}])
+    return response
 
 def insert_graph_entries(lines):
     conn = kuzu.Connection(st.session_state.kuzu_database)

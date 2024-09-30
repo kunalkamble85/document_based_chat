@@ -8,12 +8,9 @@ from sdv.single_table import GaussianCopulaSynthesizer
 from sdv.multi_table import HMASynthesizer
 from sdv.metadata import SingleTableMetadata, MultiTableMetadata
 from sdv.utils import drop_unknown_references
-import google.generativeai as genai
+from utils.langchain_utils import generate_synthetic_data
 
 # Set up Google Gemini Pro API key and model
-
-model = genai.GenerativeModel("gemini-pro")
-
 st.set_page_config(page_title="Synthetic Data Generation", page_icon=":book:", layout="wide")
 st.title("🤖 Synthetic Data Generation")
 
@@ -337,54 +334,16 @@ def normalize_weights(df, weight_column='WEIGHT(%)'):
 def convert_df(df):
     return df.to_csv(index=False).encode('utf-8')
 
-
-
-generated_benchmark_names = set()
-
-def fetch_bm_name_from_llm(bm_provider_id):
+def fetch_bm_name_from_llm(num_of_records):
     try:
-        bm_provider_id_str = str(bm_provider_id)
-        unique_benchmark_names = []
-        max_retries = 10  # Limit to 10 attempts for unique names
-        
-        while len(unique_benchmark_names) < 5:  # Change this to however many unique names you want
-            response = model.generate_content(
-                'Generate unique and distinctive names for benchmarks that do not repeat like S&P 500 Index, S&P 500 Growth Index:',
-                generation_config=genai.GenerationConfig(
-                    temperature=0.1,
-                )
-            )
-
-            generated_text = ''
-            if response and hasattr(response, 'candidates') and len(response.candidates) > 0:
-                generated_text = response.candidates[0].content.parts[0].text.strip()
-
-            benchmark_names = generated_text.split("\n")
-            benchmark_names = [name.split('. ', 1)[-1].strip() for name in benchmark_names if name.strip()]
-
-            for name in benchmark_names:
-                if name not in generated_benchmark_names:
-                    unique_benchmark_names.append(name)
-                    generated_benchmark_names.add(name)
-
-            if len(unique_benchmark_names) >= 1:  # Change this according to your needs
-                break
-            
-            max_retries -= 1
-            if max_retries == 0:
-                st.warning(f"Could not generate enough unique names for BM_PROVIDER_ID: {bm_provider_id}")
-                break
-
-        if not unique_benchmark_names:
-            st.warning(f"BM_NAME not generated for BM_PROVIDER_ID: {bm_provider_id}")
-            unique_benchmark_names = ["S&P 500 Multicap Index"]  # Default value if empty
-
-        return unique_benchmark_names
-
+        generated_text = generate_synthetic_data(num_of_records)
+        print(generated_text)
+        benchmark_names = generated_text.split("\n")
+        benchmark_names = [name.split('. ', 1)[-1].strip() for name in benchmark_names if name.strip()!="" and "20 unique" not in name]
+        return benchmark_names[:num_of_records]
     except Exception as e:
         st.error(f"Error fetching BM_NAME from LLM: {e}")
         return ["Error in BM_NAME generation"]
-
 
 
 def clean_bm_name(name):
@@ -423,7 +382,12 @@ local_paths = {
         r"./scenario_files/Benchmarks.csv",
         r"./scenario_files/Securities.csv",
         r"./scenario_files/Portfolios.csv"
-    ]
+    ],
+    "Benchmark_Constituent_with_relation": [
+        r"./scenario_files/Benchmark_Constituent.csv",
+        r"./scenario_files/Benchmarks.csv",
+        r"./scenario_files/Securities.csv"
+    ],
 }
 
 local_rules = {
@@ -433,7 +397,8 @@ local_rules = {
     "Counter_Parties": r"./scenario_rules/Counter_parties.json",
     "Benchmarks": r"./scenario_rules/Benchmarks.json",
     "Benchmark_Constituent": r"./scenario_rules/Benchmark_Constituent.json",
-    "Holding": r"./scenario_rules/Holding.json"
+    "Holding": r"./scenario_rules/Holding.json",
+	"Benchmark_Constituent_with_relation": r"./scenario_rules/Benchmark_Constituent_with_relation.json"
 }
 
 mode = st.radio("Select Mode", ["Generic", "Scenario"])
@@ -491,7 +456,7 @@ if mode == "Generic":
                     if data is not None:
                         csv = convert_df(data)
                         st.write("Output Preview.")
-                        st.dataframe(data.head(20))
+                        st.dataframe(data.head(20), hide_index=True)
                         st.write("Click below to download the entire output file.")
                         st.download_button(
                             "Download Result",
@@ -530,7 +495,7 @@ if mode == "Generic":
                             if df is not None:
                                 csv = convert_df(df)
                                 st.write(f"Output Preview for {table}.")
-                                st.dataframe(df.head(5))
+                                st.dataframe(df.head(5), hide_index=True)
                                 st.write("Click below to download the entire output file.")
                                 st.download_button(
                                     f"Download {table}",
@@ -550,7 +515,7 @@ if mode == "Generic":
 if mode == "Scenario":
     selected_scenario = st.sidebar.selectbox("Select Scenario", [
         "Securities", "Benchmark_Provider", "Benchmarks", "Benchmark_Constituent", "Portfolios", 
-        "Holding", "Counter_Parties"
+        "Holding", "Counter_Parties","Benchmark_Constituent_with_relation"
     ])
 
     if selected_scenario == "Benchmark_Constituent":
@@ -608,7 +573,7 @@ if mode == "Scenario":
                                 synthetic_data = normalize_weights(synthetic_data, weight_column='WEIGHT(%)')
                                 
                                 st.write(f"Synthetic Data with {num_rows} rows:")
-                                st.dataframe(synthetic_data)
+                                st.dataframe(synthetic_data, hide_index=True)
                                 
                                 # Convert DataFrame to CSV
                                 csv = convert_df(synthetic_data)
@@ -693,7 +658,7 @@ if mode == "Scenario":
                                 synthetic_data['SECURITY_ID'] = np.random.choice(security_ids, size=num_rows, replace=True)
                                 
                                 st.write(f"Synthetic Data with {num_rows} rows:")
-                                st.dataframe(synthetic_data)
+                                st.dataframe(synthetic_data, hide_index=True)
                                 
                                 # Convert DataFrame to CSV
                                 csv = convert_df(synthetic_data)
@@ -715,10 +680,6 @@ if mode == "Scenario":
                                     )
             except Exception as e:
                 st.error(f"Error reading or applying metadata file {metadata_file_path}: {e}")
-
-
-
-
 
     elif selected_scenario == "Benchmarks":
         benchmark_provider_df = pd.read_csv(local_paths["Benchmark_Provider"])
@@ -749,9 +710,6 @@ if mode == "Scenario":
             dataframes["Benchmarks"] = benchmarks_df
 
         # Directly specify the metadata file paths based on LLM option
-        import os 
-        cwd = os.getcwd()
-        print(cwd)
         if use_llm == "LLM":            
             metadata_file_path = "./scenario_rules/LLM_BM_Rule.json"
         else:  
@@ -767,7 +725,7 @@ if mode == "Scenario":
                     with st.spinner('Processing...'):
                         if use_llm == "LLM":
                           
-                            benchmarks_df['BM_NAME'] = benchmarks_df['BM_PROVIDER_ID'].apply(fetch_bm_name_from_llm)
+                            benchmarks_df['BM_NAME'] = fetch_bm_name_from_llm(len(benchmarks_df))
                             benchmarks_df = benchmarks_df.explode('BM_NAME')
                             benchmarks_df['BM_NAME'] = benchmarks_df['BM_NAME'].apply(clean_bm_name)
                             benchmarks_df['BM_NAME'].replace('', 'Unnamed Benchmark', inplace=True)
@@ -783,7 +741,7 @@ if mode == "Scenario":
                                 synthetic_data_unique = synthetic_data.drop_duplicates(subset='BM_NAME')
 
                                 st.write("Synthetic Data :")
-                                st.dataframe(synthetic_data_unique)
+                                st.dataframe(synthetic_data_unique, hide_index=True)
 
                                 # Download unique rows
                                 csv = convert_df(synthetic_data_unique)
@@ -807,7 +765,7 @@ if mode == "Scenario":
 
                             if synthetic_data_without_llm is not None and isinstance(synthetic_data_without_llm, pd.DataFrame):
                                 st.write("Synthetic Data:")
-                                st.dataframe(synthetic_data_without_llm.head(100))
+                                st.dataframe(synthetic_data_without_llm.head(100), hide_index=True)
 
                                 # Download all rows based on the scale
                                 csv_without_llm = convert_df(synthetic_data_without_llm)
@@ -826,12 +784,90 @@ if mode == "Scenario":
                                         mime="application/json"
                                     )
         except Exception as e:
+            import traceback
+            print(traceback.format_exc())
             st.error(f"Error reading or applying metadata file {metadata_file_path}: {e}")
 
-
-
-
-
+    elif selected_scenario == "Benchmark_Constituent_with_relation":
+        # Load necessary CSV files for multi-table processing
+        benchmark_constituent_path = local_paths["Benchmark_Constituent_with_relation"][0]  # Benchmark_Constituent.csv
+        benchmarks_csv_path = local_paths["Benchmark_Constituent_with_relation"][1]  # Benchmarks.csv
+        securities_path = local_paths["Benchmark_Constituent_with_relation"][2]  # Securities.csv
+        # Load DataFrames
+        benchmark_constituent_df = pd.read_csv(benchmark_constituent_path)
+        benchmarks_df = pd.read_csv(benchmarks_csv_path)
+        securities_df = pd.read_csv(securities_path)
+        # Add scale slider
+        scale = st.sidebar.slider("Select Scale", min_value=1, max_value=100, value=5, step=5)
+        metadata_file_path = local_rules["Benchmark_Constituent_with_relation"]
+        try:
+            with open(metadata_file_path, "r", encoding='utf-8') as metadata_file:
+                metadata_json = metadata_file.read()
+                # Auto-detect metadata for multi-table setup
+                metadata = detect_multi_table_metadata({
+                    "Benchmark_Constituent": benchmark_constituent_df,
+                    "Securities": securities_df,
+                    "Benchmarks": benchmarks_df
+                })
+                # Apply metadata from JSON (update tables)
+                apply_metadata_from_json(metadata, json.loads(metadata_json))
+                if st.button("Generate Data"):
+                    with st.spinner('Processing...'):
+                        # Generate synthetic data for multi-table setup with scaling
+                        metadata, synthetic_data = process_multi_table_Scenario({
+                            "Benchmark_Constituent": benchmark_constituent_df,
+                            "Securities": securities_df,
+                            "Benchmarks": benchmarks_df
+                        }, scale, metadata_json)
+                        if synthetic_data is not None:
+                            benchmark_constituent_synthetic = synthetic_data["Benchmark_Constituent"]
+                            securities_synthetic = synthetic_data["Securities"]
+                            benchmarks_synthetic = synthetic_data["Benchmarks"]
+                            # Normalize the WEIGHT(%) column in the synthetic Benchmark Constituent data
+                            benchmark_constituent_synthetic = normalize_weights(
+                                benchmark_constituent_synthetic, weight_column='WEIGHT(%)'
+                            )
+                            # Display and download Benchmark Constituent synthetic data
+                            st.write("Synthetic Benchmark Constituent Data:")
+                            st.dataframe(benchmark_constituent_synthetic, hide_index=True)
+                            constituent_csv = convert_df(benchmark_constituent_synthetic)
+                            st.download_button(
+                                label="Download Benchmark Constituent Synthetic Data CSV",
+                                data=constituent_csv,
+                                file_name="benchmark_constituent_synthetic_data.csv",
+                                mime="text/csv"
+                            )
+                            # Display and download Securities synthetic data
+                            st.write("Synthetic Securities Data:")
+                            st.dataframe(securities_synthetic, hide_index=True)
+                            securities_csv = convert_df(securities_synthetic)
+                            st.download_button(
+                                label="Download Securities Synthetic Data CSV",
+                                data=securities_csv,
+                                file_name="securities_synthetic_data.csv",
+                                mime="text/csv"
+                            )
+                            # Display and download Benchmarks synthetic data
+                            st.write("Synthetic Benchmarks Data:")
+                            st.dataframe(benchmarks_synthetic, hide_index=True)
+                            benchmarks_csv = convert_df(benchmarks_synthetic)
+                            st.download_button(
+                                label="Download Benchmarks Synthetic Data CSV",
+                                data=benchmarks_csv,
+                                file_name="benchmarks_synthetic_data.csv",
+                                mime="text/csv"
+                            )
+                            # Download Metadata JSON
+                            if metadata:
+                                metadata_json = metadata_to_json(metadata)
+                                st.sidebar.download_button(
+                                    label="Download Metadata JSON",
+                                    data=metadata_json,
+                                    file_name="metadata.json",
+                                    mime="application/json"
+                                )
+        except Exception as e:
+            st.error(f"Error reading or applying metadata file {metadata_file_path}: {e}")
     else:
         if selected_scenario:
             scale = st.sidebar.slider("Select Scale", min_value=1, max_value=100, value=5, step=5)
@@ -847,7 +883,7 @@ if mode == "Scenario":
                             apply_metadata_from_json(metadata, json.loads(metadata_json))
                             metadata, synthetic_data = process_single_table_Scenario(df, scale, metadata_json)
                             if synthetic_data is not None:
-                                st.dataframe(synthetic_data)
+                                st.dataframe(synthetic_data, hide_index=True)
                                 csv = convert_df(synthetic_data)
                                 st.download_button(
                                     label="Download CSV",
