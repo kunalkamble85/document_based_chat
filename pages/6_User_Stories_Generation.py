@@ -14,7 +14,7 @@ how_select = st.radio("How would you like to provide input for User Story Genera
 documents =None
 user_input =None
 if how_select == "Piece of input":
-   user_input = st.text_area("or Insert your code or use Case", value="Generate user stories to read csv file as input, tranform data and save into Oracle database", height= 200)
+   user_input = st.text_area("Insert your code or use Case", value="Generate user stories to read csv file as input, tranform data and save into Oracle database", height= 200)
 else:
    documents = st.file_uploader(label="Choose a BRD file", type=["doc","txt"])
 
