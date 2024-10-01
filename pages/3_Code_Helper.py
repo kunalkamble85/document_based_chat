@@ -28,7 +28,7 @@ else:
     sample_data = open("./sample_data/cobol_code_sample.txt").read()
     st.download_button('Download sample file', sample_data, "cobol_code_sample.txt")
 
-    how_select = st.radio("How would you like to do?", ["Upload Source File","Piece of Code", ], horizontal=True)
+    how_select = st.radio("How would you like to do?", ["Piece of Code","Upload Source File"], horizontal=True)
 
     if how_select == "Piece of Code":
         code_text = st.text_area("Insert your code", value="print('Hello')", height= 200)
