@@ -80,16 +80,15 @@ def create_jira_stories(stories_text):
             # print(issue_dict)
             new_issue = jira.create_issue(fields=issue_dict)
             created_stories.append(f"Jira link:{JIRA_SERVER}/browse/{new_issue.key}")           
-            at_text ="<ul>"
+            at_text =""
             for a in at:
-               at_text =at_text+"<li>"+a+"</li>"     
-            at_text =at_text+"</ul>"
-            return_text = f"{return_text}<br><strong>User Story {counter}</strong> (Jira link:<a href='{JIRA_SERVER}/browse/{new_issue.key}'>{new_issue.key}</a>)"
-            return_text = f"{return_text}<br><strong>Summary:</strong> {story_header}"
-            return_text = f"{return_text}<br><strong>Who:</strong> {story['Who']}"
-            return_text = f"{return_text}<br><strong>What:</strong> {story['What']}"
-            return_text = f"{return_text}<br><strong>Why:</strong> {story['Why']}"
-            return_text = f"{return_text}<br><strong>Acceptance_Criteria:</strong><br>{at_text}"
+               at_text = at_text + "<br>      -> "+ a
+            return_text = f"{return_text}<br><strong> User Story {counter}</strong> (Jira link:<a href='{JIRA_SERVER}/browse/{new_issue.key}'>{new_issue.key}</a>)"
+            return_text = f"{return_text}<br><strong> Summary:</strong> {story_header}"
+            return_text = f"{return_text}<br><strong> Who:</strong> {story['Who']}"
+            return_text = f"{return_text}<br><strong> What:</strong> {story['What']}"
+            return_text = f"{return_text}<br><strong> Why:</strong> {story['Why']}"
+            return_text = f"{return_text}<br><strong> Acceptance_Criteria:</strong><br>{at_text}"
             return_text = f"{return_text}<br><br>"
             counter+=1
         return return_text
