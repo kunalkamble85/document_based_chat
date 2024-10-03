@@ -89,7 +89,7 @@ def create_jira_stories(stories_text):
             return_text = f"{return_text}<br><strong> What:</strong> {story['What']}"
             return_text = f"{return_text}<br><strong> Why:</strong> {story['Why']}"
             return_text = f"{return_text}<br><strong> Acceptance_Criteria:</strong>{at_text}"
-            return_text = f"{return_text}<br>----------------------------------------------------<br>"
+            return_text = f"{return_text}<br>---------------------------------------------------------------------------------------------------------------------<br>"
             counter+=1
         return return_text
         # stories_text = embed_jira_into_stories(created_stories, stories_text)
