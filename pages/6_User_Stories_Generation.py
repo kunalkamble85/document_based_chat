@@ -1,5 +1,6 @@
 import streamlit as st
 from utils.langchain_utils import generate_user_stories
+from utils.jira_utils import *
 
 st.set_page_config(page_title="User Story Generation", page_icon=":book:", layout="wide")
 st.title("🤖 User Story Generation")
@@ -25,7 +26,8 @@ if button:
             user_input = documents.read()
          if user_input:
             output = generate_user_stories(user_input)
+            stories_text = create_jira_stories(output)
             st.write("Click below button to download user stories generated.")
             st.download_button('Download User Stories', output, "user_stories.txt")
             # st.code(output, language="python", line_numbers=False)    
-            st.markdown(f"""<p style="background-color: #DEDDDD">{output}</p>""", unsafe_allow_html=True)    
+            st.markdown(f"""<p style="background-color: #DEDDDD">{stories_text}</p>""", unsafe_allow_html=True)

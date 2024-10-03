@@ -34,6 +34,7 @@ def get_generate_user_stories_prompt(user_input):
         You are an certified product owner of Agile Scrum methodology and you know how to write perfect User Story for Agile Scrum process. 
         In user_input, I would be providing you the Buiness Use Case. 
         Understand the context of use case and generate detailed level user stories.
+        Output format must be json object with Summary, Who, What, Why and Acceptance_Criteria tags.
         Buiness Use Case:
         {user_input}
         """

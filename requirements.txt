@@ -19,3 +19,4 @@ langchain-google-genai
 streamlit-extras
 pysqlite3-binary
 oci
+jira
