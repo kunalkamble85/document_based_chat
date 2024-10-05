@@ -54,7 +54,6 @@ def handle_llama_model_request(model, messages):
 
     if model =="meta.llama3.1-405b":
         chat_detail.serving_mode = oci.generative_ai_inference.models.DedicatedServingMode(endpoint_id=model_id)
-        print("Calling custom endpoint")
     else:
         chat_detail.serving_mode = oci.generative_ai_inference.models.OnDemandServingMode(model_id=model_id)
     chat_detail.chat_request = chat_request
