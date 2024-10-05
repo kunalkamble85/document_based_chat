@@ -1,4 +1,5 @@
 import oci
+import streamlit as st
 
 compartment_id = "ocid1.compartment.oc1..aaaaaaaacqxr3j2qbhntidg2s32gb67lv7ydpbfkvcazqvnjfsaxj3vdxr7a"
 CONFIG_PROFILE = "DEFAULT"
@@ -8,6 +9,7 @@ config = oci.config.from_file('./config/config', CONFIG_PROFILE)
 endpoint = "https://inference.generativeai.uk-london-1.oci.oraclecloud.com"
 model_endpoint_map = {"meta.llama3.1-70b":"ocid1.generativeaimodel.oc1.uk-london-1.amaaaaaask7dceyarp4fbl4nicr66ibhaqqxg5w77nnzlgmof5hinslboika",
                       "meta.llama3-70b":"ocid1.generativeaimodel.oc1.uk-london-1.amaaaaaask7dceyaplxvoaiprdoltkphy3fg3ml2xxgt3mwrdptolv5fs5rq",
+                      "meta.llama3.1-405b": "ocid1.generativeaiendpoint.oc1.uk-london-1.amaaaaaah7afz4ia4s7lwl5qt7bmupjqknwyvwbfpi7id3onks5rdaga2v5a",
                       "cohore.command-r-plus":"ocid1.generativeaimodel.oc1.uk-london-1.amaaaaaask7dceyakvoc45z4fz5scsxtactirnhh2icdyuwffp7x3bxkq7fa",
                       "cohore.command-r-16k":"ocid1.generativeaimodel.oc1.uk-london-1.amaaaaaask7dceyauryaezgbyqwehvckgv6sxv3mr7z2l2i4xpbtfoxkemfa"}
 
@@ -40,14 +42,21 @@ def handle_llama_model_request(model, messages):
     chat_request = oci.generative_ai_inference.models.GenericChatRequest()
     chat_request.api_format = oci.generative_ai_inference.models.BaseChatRequest.API_FORMAT_GENERIC
     chat_request.messages = all_oci_messages
-    chat_request.max_tokens = 4000
-    chat_request.temperature = 0.1
+    if model == "meta.llama3-70b":
+        chat_request.max_tokens = 8000
+    else:
+        chat_request.max_tokens = 128000
+    chat_request.temperature = st.session_state.temprature
     chat_request.frequency_penalty = 0
     chat_request.presence_penalty = 0
     chat_request.top_p = 0.75
     chat_request.top_k = -1
 
-    chat_detail.serving_mode = oci.generative_ai_inference.models.OnDemandServingMode(model_id=model_id)
+    if model =="meta.llama3.1-405b":
+        chat_detail.serving_mode = oci.generative_ai_inference.models.DedicatedServingMode(endpoint_id=model_id)
+        print("Calling custom endpoint")
+    else:
+        chat_detail.serving_mode = oci.generative_ai_inference.models.OnDemandServingMode(model_id=model_id)
     chat_detail.chat_request = chat_request
     chat_detail.compartment_id = compartment_id
     chat_response = generative_ai_inference_client.chat(chat_detail)
@@ -70,7 +79,7 @@ def handle_cohore_model_request(model, messages):
     chat_request = oci.generative_ai_inference.models.CohereChatRequest()
     chat_request.message = user_last_message
     chat_request.max_tokens = 4000
-    chat_request.temperature = 0.1
+    chat_request.temperature = st.session_state.temprature
     chat_request.frequency_penalty = 0
     chat_request.top_p = 0.75
     chat_request.top_k = 0

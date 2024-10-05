@@ -57,8 +57,8 @@ with st.sidebar:
 
 st.title("🤖 Welcome to Oracle Finergy LLM Demo")
 
-cloud_models = {"OCP":["meta.llama3.1-70b","meta.llama3-70b","cohore.command-r-plus","cohore.command-r-16k"],"GCP":['Gemini Pro'],"AWS":['Claude Sonnet'],"OpenAI":['gpt-4o-mini']}
-st.session_state.LLM_MODEL = "meta.llama3.1-70b"
+cloud_models = {"OCP":["meta.llama3.1-405b","meta.llama3.1-70b","meta.llama3-70b","cohore.command-r-plus","cohore.command-r-16k"],"GCP":['Gemini Pro'],"AWS":['Claude Sonnet'],"OpenAI":['gpt-4o-mini']}
+st.session_state.LLM_MODEL = "meta.llama3.1-405b"
 userid = st.text_input("Enter your user id.")
 print(f"Loging sucussful:{userid}")
 # cloud_provider = st.radio(
@@ -76,7 +76,7 @@ model_name = st.radio(
 st.markdown(''':red[All models are served by Oracle Gen AI services]''')
 
 temprature = st.slider("Set the model temprature", min_value=0.0, max_value=1.0, value=0.1, step=0.1)
-
+st.session_state.temprature = temprature
 button = st.button(label="Proceed")
 if button:
     st.session_state.CHROMA_DB_PATH = f"./vector_database/{userid}"
