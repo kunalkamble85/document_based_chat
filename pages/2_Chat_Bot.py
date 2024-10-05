@@ -1,8 +1,10 @@
 import streamlit as st
 from utils.oci_utils import *
 from PIL import Image
+from utils.langchain_utils import display_sidebar
 
 st.set_page_config(page_title="Chat with AI", page_icon=":book:", layout="wide")
+display_sidebar()
 st.title("🤖 Chat with AI")
 
 
@@ -15,6 +17,11 @@ if "chat_messages" not in st.session_state:
     st.session_state["chat_messages"] = [{"role":"assistant" , "content":"Ask your question"}]
 if "history" not in st.session_state:
     st.session_state.history = []
+
+clear_history = st.button("Clear conversation history")
+if clear_history:
+    st.session_state["chat_messages"] = [{"role":"assistant" , "content":"Ask your question"}]
+    st.session_state["history"] = []
 
 for message in st.session_state["chat_messages"]:
     # with st.chat_message(message["role"]):

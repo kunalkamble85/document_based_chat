@@ -8,10 +8,11 @@ from sdv.single_table import GaussianCopulaSynthesizer
 from sdv.multi_table import HMASynthesizer
 from sdv.metadata import SingleTableMetadata, MultiTableMetadata
 from sdv.utils import drop_unknown_references
-from utils.langchain_utils import generate_synthetic_data
+from utils.langchain_utils import generate_synthetic_data, display_sidebar
 
 # Set up Google Gemini Pro API key and model
 st.set_page_config(page_title="Synthetic Data Generation", page_icon=":book:", layout="wide")
+display_sidebar()
 st.title("🤖 Synthetic Data Generation")
 
 def detect_single_table_metadata(df):

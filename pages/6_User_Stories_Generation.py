@@ -1,8 +1,9 @@
 import streamlit as st
-from utils.langchain_utils import generate_user_stories
+from utils.langchain_utils import generate_user_stories, display_sidebar
 from utils.jira_utils import *
 
 st.set_page_config(page_title="User Story Generation", page_icon=":book:", layout="wide")
+display_sidebar()
 st.title("🤖 User Story Generation")
 
 @st.cache_data

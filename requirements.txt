@@ -20,3 +20,4 @@ streamlit-extras
 pysqlite3-binary
 oci
 jira
+duckdb

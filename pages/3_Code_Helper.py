@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.langchain_utils import process_source_code
+from utils.langchain_utils import process_source_code, display_sidebar
 
 source = {"python":"Python", "java":"Java", "c":"C", "cobol":"COBOL", "php":"PHP","r":"R","js":"JavaScript","angularJS":"angularJS","reactJS":"reactJS"}
 target = {"java":"Java","python":"Python","php":"PHP","r":"R","js":"JavaScript", "reactJS":"reactJS", "angularJS":"angularJS"}
@@ -7,6 +7,7 @@ languages_extensions = {"java":".java","php":".php","python":".py","r":".R","js"
 
 
 st.set_page_config(page_title="🤖 Code conversion/Documentation", page_icon=":book:", layout="wide")
+display_sidebar()
 st.title("🤖 Code Conversion/Documentation")
 
 task = st.radio("What would you like to do?", ["Generate Code", "Convert Code", "Explain Code"], horizontal=True)

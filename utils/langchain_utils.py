@@ -8,6 +8,51 @@ import pandas as pd
 import streamlit as st
 import kuzu
 from utils.oci_utils import *
+import base64
+from pathlib import Path
+
+def display_sidebar():
+    custom_css = """
+    <style>
+        [data-testid=stSidebar] {
+            background-color: #DEDDDD !important;
+        }
+    </style>
+    """
+    # Apply custom CSS
+    st.markdown(custom_css, unsafe_allow_html=True)
+    # Streamlit app content, including the sidebar
+    with st.sidebar:
+        pass
+    with st.sidebar:
+        logo = f"url(data:image/png;base64,{base64.b64encode(Path('./images/oracle_logo.jpg').read_bytes()).decode()})"
+        st.markdown(
+            f"""
+            <style>
+                [data-testid="stSidebarNav"] {{
+                    background-image: {logo};
+                    background-repeat: no-repeat;
+                    padding-top: 180px;
+                    background-size: 290px 120px;
+                    background-position: 20px 20px;
+                }}
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with st.sidebar:
+        st.write("""<div style="width:100%;text-align:left">
+                <br style="font-size: 1em;"><b>Powered by</b>
+                <br style="font-size: 3em; font-weight: bold;"><b><u>OCI Generative AI</u></b>    
+                </div>      
+                """, unsafe_allow_html=True)
+        
+        st.write("""<div style="width:100%;text-align:left">
+                <br style="font-size: 1em;"><b>Built by</b>
+                <br style="font-size: 3em; font-weight: bold;"><b><u>Finergy AI Team</u></b>    
+                </div>      
+                """, unsafe_allow_html=True)
 
 def get_test_case_for_code(user_input):
     template = f"""
@@ -190,3 +235,39 @@ def create_graph_in_database(file):
     with open(temp_file_path) as file:
         lines = file.readlines()
         insert_graph_entries(lines)
+
+import re
+from utils.duckdb_utils import *
+
+def get_data_from_chat_db(conversation):
+    question  = conversation[-1]["content"]
+
+    customers_ddl = "CREATE TABLE IF NOT EXISTS customers (Customer_ID VARCHAR, Name VARCHAR, Age INTEGER, SSN VARCHAR, Occupation VARCHAR, Annual_Income FLOAT)"
+    accounts_ddl = "CREATE TABLE IF NOT EXISTS accounts (Customer_ID VARCHAR, Num_Bank_Accounts INTEGER, Num_Credit_Card INTEGER, Num_of_Loan INTEGER, Type_of_Loan VARCHAR)"
+    records_ddl = "CREATE TABLE IF NOT EXISTS monthly_records (ID VARCHAR, Customer_ID VARCHAR, Month VARCHAR, Monthly_Inhand_Salary FLOAT, Delay_from_due_date INTEGER, Num_of_Delayed_Payment INTEGER, Changed_Credit_Limit FLOAT, Num_Credit_Inquiries INTEGER, Credit_Mix VARCHAR, Outstanding_Debt FLOAT, Credit_Utilization_Ratio FLOAT, Credit_History_Age VARCHAR, Payment_of_Min_Amount VARCHAR, Total_EMI_per_month FLOAT, Amount_invested_monthly FLOAT, Payment_Behaviour VARCHAR, Monthly_Balance FLOAT)"
+
+    chat_db_prompt = f"""
+    You are an ANSI SQL expert.
+    Please help to generate a SQL query to answer the question. 
+    Your response should ONLY be based on the given context and follow the response guidelines and format instructions.
+    Only use below tables schemas to generate query:
+    {customers_ddl}
+    {accounts_ddl}
+    {records_ddl}
+    Always place the generated SQL into <sql></sql> tags.
+
+    Question: {question}
+    """
+    messages = conversation[:-1]
+    messages.append({"role":"user", "content": chat_db_prompt})
+    output = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, messages)
+    sql_text = re.search(r"<sql>(.*?)</sql>", output, re.DOTALL)
+    print(sql_text)
+    if sql_text:
+        sql_text =  sql_text.group(1)
+    try:
+        df = execute_query(sql_text)
+        return sql_text, df 
+    except:
+        print(traceback.format_exc())
+        return sql_text, None

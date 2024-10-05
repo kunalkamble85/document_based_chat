@@ -1,8 +1,9 @@
 import streamlit as st
-from utils.langchain_utils import get_text_from_documents, summarize_document
+from utils.langchain_utils import get_text_from_documents, summarize_document, display_sidebar
 
 
 st.set_page_config(page_title="🤖 Text Summarize", page_icon=":book:", layout="wide")
+display_sidebar()
 st.title("🤖 Text Summarize")
 
 how_select = st.radio("How would you like provide your text?", ["Upload File", "Enter Text"], horizontal=True)

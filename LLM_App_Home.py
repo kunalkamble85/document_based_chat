@@ -6,55 +6,10 @@ import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 import streamlit as st
-import base64
-from pathlib import Path
+from utils.langchain_utils import display_sidebar
 
 st.set_page_config(page_title="🤖 LLM Home", page_icon=":book:", layout="wide")
-
-custom_css = """
-<style>
-    [data-testid=stSidebar] {
-        background-color: #DEDDDD !important;
-    }
-</style>
-"""
-# Apply custom CSS
-st.markdown(custom_css, unsafe_allow_html=True)
-
-# Streamlit app content, including the sidebar
-with st.sidebar:
-    pass
-
-with st.sidebar:
-    logo = f"url(data:image/png;base64,{base64.b64encode(Path('./images/oracle_logo.jpg').read_bytes()).decode()})"
-    st.markdown(
-        f"""
-        <style>
-            [data-testid="stSidebarNav"] {{
-                background-image: {logo};
-                background-repeat: no-repeat;
-                padding-top: 180px;
-                background-size: 290px 120px;
-                background-position: 20px 20px;
-            }}
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-with st.sidebar:
-    st.write("""<div style="width:100%;text-align:left">
-            <br style="font-size: 1em;"><b>Powered by</b>
-            <br style="font-size: 3em; font-weight: bold;"><b><u>OCI Generative AI</u></b>    
-            </div>      
-            """, unsafe_allow_html=True)
-      
-    st.write("""<div style="width:100%;text-align:left">
-            <br style="font-size: 1em;"><b>Built by</b>
-            <br style="font-size: 3em; font-weight: bold;"><b><u>Finergy AI Team</u></b>    
-            </div>      
-            """, unsafe_allow_html=True)
-
+display_sidebar()
 st.title("🤖 Welcome to Oracle Finergy LLM Demo")
 
 cloud_models = {"OCP":["meta.llama3.1-405b","meta.llama3.1-70b","meta.llama3-70b","cohore.command-r-plus","cohore.command-r-16k"],"GCP":['Gemini Pro'],"AWS":['Claude Sonnet'],"OpenAI":['gpt-4o-mini']}
@@ -79,9 +34,12 @@ temprature = st.slider("Set the model temprature", min_value=0.0, max_value=1.0,
 st.session_state.temprature = temprature
 button = st.button(label="Proceed")
 if button:
-    st.session_state.CHROMA_DB_PATH = f"./vector_database/{userid}"
-    print(st.session_state.CHROMA_DB_PATH)
-    st.session_state.KUZU_DB_PATH = f"./kuzu_database/{userid}"
-    print(st.session_state.KUZU_DB_PATH)
-    st.session_state.LLM_MODEL = model_name
-    st.success("Session created successfully, please click on application from left menu.")
+    if userid:
+        st.session_state.CHROMA_DB_PATH = f"./vector_database/{userid}"
+        print(st.session_state.CHROMA_DB_PATH)
+        st.session_state.KUZU_DB_PATH = f"./kuzu_database/{userid}"
+        print(st.session_state.KUZU_DB_PATH)
+        st.session_state.LLM_MODEL = model_name
+        st.success("Session created successfully, please click on application from left menu.")
+    else:
+        st.error("Please enter valid userid")

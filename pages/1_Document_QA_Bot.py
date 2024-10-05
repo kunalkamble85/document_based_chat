@@ -2,7 +2,7 @@ import streamlit as st
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from PIL import Image
 from utils.file_reader import *
-from utils.langchain_utils import get_text_from_documents
+from utils.langchain_utils import get_text_from_documents, display_sidebar
 from langchain.chains.question_answering import load_qa_chain
 from langchain_community.vectorstores.faiss import DistanceStrategy
 import os
@@ -12,6 +12,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from utils.oci_utils import *
 
 st.set_page_config(page_title="Q and A using Documents", page_icon=":book:", layout="wide")
+display_sidebar()
 with st.container():
     if "CHROMA_DB_PATH" not in st.session_state:
         st.error("Please enter your user id in home page.")
