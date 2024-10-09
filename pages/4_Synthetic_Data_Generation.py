@@ -15,6 +15,11 @@ st.set_page_config(page_title="Synthetic Data Generation", page_icon=":book:", l
 display_sidebar()
 st.title("🤖 Synthetic Data Generation")
 
+def create_email(name):
+    name = ".".join(name.split())
+    email = f"{name}@gmail.com"
+    return email
+
 def detect_single_table_metadata(df):
     metadata = SingleTableMetadata()
     metadata.detect_from_dataframe(df)
@@ -886,8 +891,7 @@ if mode == "Portfolio Management Data Generation":
                             metadata, synthetic_data = process_single_table_Scenario(df, scale, metadata_json)
                             if synthetic_data is not None:
                                 if selected_scenario == "Counter_Parties":
-                                    df[['first_name', 'last_name']] = synthetic_data['CONTACT_PERSON'].str.split(expand=True)
-                                    synthetic_data["EMAIL"] = (df['first_name'].str.lower() + '.' + df['last_name'].str.lower() + '@gmail.com')
+                                    synthetic_data["EMAIL"] = synthetic_data['CONTACT_PERSON'].apply(create_email)
                             
                                 st.dataframe(synthetic_data, hide_index=True)
                                 csv = convert_df(synthetic_data)
@@ -906,6 +910,8 @@ if mode == "Portfolio Management Data Generation":
                                         mime="application/json"
                                     )
             except Exception as e:
+                import traceback
+                print(traceback.format_exc())
                 st.error(f"Error reading metadata file {metadata_file_path}: {e}")
         except Exception as e:
                 st.error(f"Error reading data file {local_paths[selected_scenario]}: {e}")
