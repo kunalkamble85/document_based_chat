@@ -884,6 +884,9 @@ if mode == "Portfolio Management Data Generation":
                             metadata = detect_single_table_metadata(df)
                             apply_metadata_from_json(metadata, json.loads(metadata_json))
                             metadata, synthetic_data = process_single_table_Scenario(df, scale, metadata_json)
+                            if selected_scenario == "Counter_Parties":
+                                df[['first_name', 'last_name']] = synthetic_data['CONTACT_PERSON'].str.split(expand=True)
+                                synthetic_data["EMAIL"] = (df['first_name'].str.lower() + '.' + df['last_name'].str.lower() + '@gmail.com')
                             if synthetic_data is not None:
                                 st.dataframe(synthetic_data, hide_index=True)
                                 csv = convert_df(synthetic_data)
