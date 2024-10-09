@@ -402,9 +402,9 @@ local_rules = {
 	"Benchmark_Constituent_with_relation": r"./scenario_rules/Benchmark_Constituent_with_relation.json"
 }
 
-mode = st.radio("Select Mode", ["Generic", "Scenario"])
+mode = st.radio("Select Mode", ["Generic Data Generation", "Portfolio Management Data Generation"])
 
-if mode == "Generic":
+if mode == "Generic Data Generation":
     selected_rule = st.sidebar.selectbox("Select Sample Rule Type To Download", list(sample_rules.keys()))
 
     if selected_rule:
@@ -513,7 +513,7 @@ if mode == "Generic":
                                 "application/json"
                             )
 
-if mode == "Scenario":
+if mode == "Portfolio Management Data Generation":
     selected_scenario = st.sidebar.selectbox("Select Scenario", [
         "Securities", "Benchmark_Provider", "Benchmarks", "Benchmark_Constituent", "Portfolios", 
         "Holding", "Counter_Parties","Benchmark_Constituent_with_relation"
@@ -657,6 +657,7 @@ if mode == "Scenario":
                                 
                                 # Randomly assign SECURITY_ID values from the Securities table
                                 synthetic_data['SECURITY_ID'] = np.random.choice(security_ids, size=num_rows, replace=True)
+                                synthetic_data['MARKET_VALUE'] = synthetic_data['PAR'] * synthetic_data['CURRENT_PRICE']
                                 
                                 st.write(f"Synthetic Data with {num_rows} rows:")
                                 st.dataframe(synthetic_data, hide_index=True)
