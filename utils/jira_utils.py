@@ -17,40 +17,46 @@ jira = JIRA(options, basic_auth=(JIRA_EMAIL, JIRA_API_TOKEN))
 
 def get_stories_from_llm_response(stories_text):
     try:
-        pattern = r"User Story (.*?)\n"
-        matches = re.findall(pattern, stories_text, re.MULTILINE)
-        story_summaries = [i.split(":")[-1].strip() for i in matches]    
-        print(story_summaries)
-        pattern = r"\{([^}]*)\}"
-        matches = re.findall(pattern, stories_text, re.MULTILINE)
-        story_details = []
-        counter = 0
-        for story_detail in matches:
-            details =  story_detail.replace("\n","")       
-            details = "{" +details+ "}"
-            json_obj = json.loads(details)   
-            if len(story_summaries) > counter:         
-                json_obj["story_summary"] = story_summaries[counter]
-            counter += 1
-            story_details.append(json_obj)
-        print(story_details)
-        return story_details
+        pattern = r"```json(.*?)```"
+        match = re.search(pattern, stories_text, re.DOTALL)
+        if match:
+            tasks_string = match.group(1).strip()
+        else:
+            pattern = r"```(.*?)```"
+            match = re.search(pattern, stories_text, re.DOTALL)
+            if match:
+                tasks_string = match.group(1).strip()
+            else:
+                tasks_string = stories_text
+        json_obj = json.loads(tasks_string)   
+        return json_obj    
     except:
         print(traceback.format_exc())
-        return [],[]
+        return None
 
-def embed_jira_into_stories(jira_links, stories_text):
-    pattern = r"User Story (.*?)\n"
-    matches = re.findall(pattern, stories_text, re.MULTILINE)
-    if len(matches) > 0:
-        counter = 0
-        for match in matches:
-            stories_text = stories_text.replace(match, f"{match} ({jira_links[counter]})")
-            counter+=1
-    else:
-        story_links = "\n".join(jira_links)
-        stories_text = stories_text + "\n" + story_links
-    return stories_text
+
+def create_jira_subtasks(tasks, parent):
+    task_tickets = {}
+    try:
+        for task in tasks:
+            role = task["role"]
+            if role == "Business Analyst": role = "BA"
+            if role == "Quality Assurance": role = "QA"
+            summary = task["task"]
+            task_str = f"{role}: {summary}"
+            issue_dict = {
+                'project': {'key': JIRA_PROJECT_KEY},
+                'summary': task_str,
+                'description': task_str,
+                'issuetype': {'name': 'Subtask'},
+                "parent":{"key": parent}
+            }
+            new_issue = jira.create_issue(fields=issue_dict)
+            task_tickets[task_str] = new_issue.key
+    except:
+        print(traceback.format_exc())
+        print("Error while creating sub tasks.")
+    return task_tickets
 
 
 def create_jira_stories(stories_text):
@@ -61,7 +67,7 @@ def create_jira_stories(stories_text):
         return_text = ""
         counter = 1
         for story in story_details:            
-            story_header = story["story_summary"] if "story_summary" in story else story["Summary"]
+            story_header = story["Summary"]
             at = story["Acceptance_Criteria"]
             at_text = "\n".join(at)
             story_Details = f"""
@@ -79,7 +85,8 @@ def create_jira_stories(stories_text):
             }
             # print(issue_dict)
             new_issue = jira.create_issue(fields=issue_dict)
-            created_stories.append(f"Jira link:{JIRA_SERVER}/browse/{new_issue.key}")           
+            created_stories.append(f"Jira link:{JIRA_SERVER}/browse/{new_issue.key}")          
+            jira_tickets = create_jira_subtasks(story["Tasks"], new_issue.key) 
             at_text =""
             for a in at:
                at_text = at_text + "<br>      -> "+ a
@@ -89,90 +96,17 @@ def create_jira_stories(stories_text):
             return_text = f"{return_text}<br><strong> What:</strong> {story['What']}"
             return_text = f"{return_text}<br><strong> Why:</strong> {story['Why']}"
             return_text = f"{return_text}<br><strong> Acceptance_Criteria:</strong>{at_text}"
+            return_text = f"{return_text}<br><strong> Sub-Tasks:</strong>"
+            for task, link in jira_tickets.items():
+                return_text = f"{return_text}<br>&nbsp;&nbsp;&nbsp;&nbsp;<strong>{task}</strong> (Jira link:<a href='{JIRA_SERVER}/browse/{link}'>{link}</a>)"
+
             return_text = f"{return_text}<br>---------------------------------------------------------------------------------------------------------------------<br>"
             counter+=1
         return return_text
-        # stories_text = embed_jira_into_stories(created_stories, stories_text)
     except:
         print(traceback.format_exc())
     return stories_text
 
-
-
-a="""
-    Here are the detailed level user stories for the given business use case:
-
-    User Story 1: Read CSV File
-
-    {
-    "Summary": "As a system, I want to read a CSV file as input so that I can process the data.",
-    "Who": "System",
-    "What": "Read CSV file",
-    "Why": "To process the data from the CSV file",
-    "Acceptance_Criteria": [
-        "The system can read a CSV file from a specified location.",
-        "The system can handle CSV files with varying numbers of columns and rows.",
-        "The system can detect and handle errors in the CSV file format."
-    ]
-    }
-
-    User Story 2: Validate CSV Data
-
-    {
-    "Summary": "As a system, I want to validate the data from the CSV file so that I can ensure data quality.",
-    "Who": "System",
-    "What": "Validate CSV data",
-    "Why": "To ensure data quality and prevent errors",
-    "Acceptance_Criteria": [
-        "The system can validate the data types of each column in the CSV file.",
-        "The system can check for missing or empty values in the CSV file.",
-        "The system can detect and handle invalid data formats in the CSV file."
-    ]
-    }
-
-    User Story 3: Transform Data
-
-    {
-    "Summary": "As a system, I want to transform the data from the CSV file so that it can be saved in the Oracle database.",
-    "Who": "System",
-    "What": "Transform data",
-    "Why": "To convert the data into a format compatible with the Oracle database",
-    "Acceptance_Criteria": [
-        "The system can perform data type conversions as required by the Oracle database.",
-        "The system can handle data formatting and masking as required by the Oracle database.",
-        "The system can detect and handle errors during data transformation."
-    ]
-    }
-
-    User Story 4: Connect to Oracle Database
-
-    {
-    "Summary": "As a system, I want to connect to the Oracle database so that I can save the transformed data.",
-    "Who": "System",
-    "What": "Connect to Oracle database",
-    "Why": "To establish a connection to the Oracle database for data saving",
-    "Acceptance_Criteria": [
-        "The system can establish a connection to the Oracle database using the provided credentials.",
-        "The system can handle connection errors and timeouts.",
-        "The system can detect and handle database authentication errors."
-    ]
-    }
-
-    User Story 5: Save Data to Oracle Database
-
-    {
-    "Summary": "As a system, I want to save the transformed data to the Oracle database so that it can be stored and retrieved.",
-    "Who": "System",
-    "What": "Save data to Oracle database",
-    "Why": "To store the transformed data in the Oracle database",
-    "Acceptance_Criteria": [
-        "The system can save the transformed data to the Oracle database.",
-        "The system can handle data insertion errors and rollbacks.",
-        "The system can detect and handle database constraints and triggers."
-    ]
-    }
-
-    These user stories cover the entire process of reading a CSV file, transforming the data, and saving it to an Oracle database. Each user story has a clear summary, who, what, why, and acceptance criteria that define the requirements for the story.
-    """
-# print(create_jira_stories(stories_text))
+a = """"""
+# print(get_stories_from_llm_response(a))
 

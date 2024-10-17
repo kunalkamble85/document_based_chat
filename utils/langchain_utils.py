@@ -75,14 +75,24 @@ def get_test_case_for_use_case(user_input):
     return template
 
 def get_generate_user_stories_prompt(user_input):
+
+    json_format = """
+    [
+        {'Summary':'Summary1', 'Who':'Portfolio Manager1', 'What': 'Implement Story1','Why': 'Business Reason', 'Acceptance_Criteria':['Must: AT1','Could: AT2','Could: AT3','Should: AT4'], 'Tasks':['role':'Business Analyst','task':'task1', 'role':'Business Analyst','task':'task5', 'role':'Developer','task':'task2', 'role':'Quality Assurance','task':'task2']}
+        {'Summary':'Summary2', 'Who':'Portfolio Manager2', 'What': 'Implement Story2','Why': 'Business Reason','Acceptance_Criteria':['Must: AT1','Must: AT2','Could: AT3','Should: AT4'], 'Tasks':['role':'Business Analyst','task':'task1', 'role':'Developer','task':'task2', 'role':'Developer','task':'task6', 'role':'Quality Assurance','task':'task2', 'role':'Quality Assurance','task':'task7']}
+    ]
+    """
     template = f"""
         You are an certified product owner of Agile Scrum methodology and you know how to write perfect User Story for Agile Scrum process. 
         In user_input, I would be providing you the Buiness Use Case. 
-        Understand the context of use case and generate detailed level user stories.
-        Output format must be json object with Summary, Who, What, Why and Acceptance_Criteria tags.
+        Understand the context of use case and generate detailed level User Stories.
+        Understand the User Story and generate tasks for Business Analyst, Developer and Quality Assurance roles for each User Story.
+        Output format must be json object as per Example Json format.
+        Example Json format: 
+        {json_format}
         Buiness Use Case:
         {user_input}
-        """
+    """
     return template
 
 
@@ -188,7 +198,6 @@ def generate_user_stories(input):
     prompt = get_generate_user_stories_prompt(input)
     output = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, [{"role":"user", "content": prompt}])
     return output
-
 
 def process_source_code(input, option, source_language, target_language):
     if option == "Convert Code":
