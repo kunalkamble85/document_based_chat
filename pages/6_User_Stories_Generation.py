@@ -29,6 +29,6 @@ if button:
             output = generate_user_stories(user_input)
             stories_text = create_jira_stories(output)
             st.write("Click below button to download user stories generated.")
-            st.download_button('Download User Stories', output, "user_stories.txt")
+            st.download_button('Download User Stories', stories_text, "user_stories.html")
             # st.code(output, language="python", line_numbers=False)    
             st.markdown(f"""<p style="background-color: #DEDDDD">{stories_text}</p>""", unsafe_allow_html=True)
