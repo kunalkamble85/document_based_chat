@@ -18,6 +18,7 @@ generative_ai_inference_client = oci.generative_ai_inference.GenerativeAiInferen
 chat_detail = oci.generative_ai_inference.models.ChatDetails()
 
 def generate_oci_gen_ai_response(model, messages):
+    print(messages)
     if model.startswith("cohore.command"):
         print(f"Sending request to model Cohore Command model {model}")
         return handle_cohore_model_request(model, messages)
@@ -60,6 +61,7 @@ def handle_llama_model_request(model, messages):
     chat_detail.compartment_id = compartment_id
     chat_response = generative_ai_inference_client.chat(chat_detail)
     response = chat_response.data.chat_response.choices[0].message.content[0].text
+    print(f"Got Response from {model}.")
     return response
 
 def handle_cohore_model_request(model, messages):
@@ -90,6 +92,7 @@ def handle_cohore_model_request(model, messages):
     chat_detail.compartment_id = compartment_id
     chat_response = generative_ai_inference_client.chat(chat_detail)
     response = chat_response.data.chat_response.chat_history[-1].message
+    print(f"Got Response from {model}.")
     return response
     
 

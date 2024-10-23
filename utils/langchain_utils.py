@@ -66,7 +66,7 @@ def get_test_case_for_code(user_input):
 
 def get_test_case_for_use_case(user_input):
     template = f"""
-        You are an expert programmer and you know how to write test cases in any programming languages. 
+        You are an Quality Assurance expert and you know how to convert Business Requirement into higher level business test cases. 
         In user_input, I would be providing you the business use case. 
         Understand the context of use case and generate higher level test cases.  
         Do not include my question in your answer.
@@ -187,7 +187,7 @@ def get_text_from_documents(file):
 
 
 def generate_tests_using_google(input, option):
-    if option == "Code":
+    if option == "Using Code":
         prompt = get_test_case_for_code(input)
     else:
         prompt = get_test_case_for_use_case(input)

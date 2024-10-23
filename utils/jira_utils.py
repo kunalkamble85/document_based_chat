@@ -44,6 +44,7 @@ def create_jira_subtasks(tasks, parent):
             if role == "Quality Assurance": role = "QA"
             summary = task["task"]
             task_str = f"{role}: {summary}"
+            print(f"Creating Jira ticket for Task: {summary}")
             issue_dict = {
                 'project': {'key': JIRA_PROJECT_KEY},
                 'summary': task_str,
@@ -68,6 +69,7 @@ def create_jira_stories(stories_text):
         counter = 1
         for story in story_details:            
             story_header = story["Summary"]
+            print(f"Creating Jira ticket for Story: {story_header}")
             at = story["Acceptance_Criteria"]
             at_text = "\n".join(at)
             story_Details = f"""
