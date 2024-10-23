@@ -43,9 +43,9 @@ def handle_llama_model_request(model, messages):
     chat_request.api_format = oci.generative_ai_inference.models.BaseChatRequest.API_FORMAT_GENERIC
     chat_request.messages = all_oci_messages
     if model == "meta.llama3-70b":
-        chat_request.max_tokens = 8000
+        chat_request.max_tokens = 4000
     else:
-        chat_request.max_tokens = 128000
+        chat_request.max_tokens = 4000
     chat_request.temperature = st.session_state.temprature
     chat_request.frequency_penalty = 0
     chat_request.presence_penalty = 0
