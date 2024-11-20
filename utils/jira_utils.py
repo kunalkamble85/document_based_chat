@@ -28,7 +28,9 @@ def get_stories_from_llm_response(stories_text):
                 tasks_string = match.group(1).strip()
             else:
                 tasks_string = stories_text
+        tasks_string = tasks_string.replace("'Acceptance Criteria'","'Acceptance_Criteria'")
         json_obj = json.loads(tasks_string)   
+        print(f"json_obj:{json_obj}")
         return json_obj    
     except:
         print(traceback.format_exc())
@@ -39,6 +41,12 @@ def create_jira_subtasks(tasks, parent):
     task_tickets = {}
     try:
         for task in tasks:
+            if "role" not in task: 
+                print("role key not found")
+                continue
+            if "task" not in task: 
+                print("task key not found")
+                continue
             role = task["role"]
             if role == "Business Analyst": role = "BA"
             if role == "Quality Assurance": role = "QA"
@@ -67,7 +75,26 @@ def create_jira_stories(stories_text):
         created_stories =[]
         return_text = ""
         counter = 1
-        for story in story_details:            
+        for story in story_details:  
+            if "Summary" not in story: 
+                print("Summary key not found")
+                continue
+            if "Acceptance_Criteria" not in story: 
+                print("Acceptance_Criteria key not found")
+                continue
+            if "Tasks" not in story: 
+                print("Tasks key not found")
+                continue
+            if "Who" not in story: 
+                print("Who key not found")
+                continue
+            if "What" not in story: 
+                print("What key not found")
+                continue
+            if "Why" not in story: 
+                print("Why key not found")
+                continue
+
             story_header = story["Summary"]
             print(f"Creating Jira ticket for Story: {story_header}")
             at = story["Acceptance_Criteria"]

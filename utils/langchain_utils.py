@@ -11,6 +11,7 @@ from utils.oci_utils import *
 import base64
 from pathlib import Path
 
+
 def display_sidebar():
     custom_css = """
     <style>
@@ -78,8 +79,8 @@ def get_generate_user_stories_prompt(user_input):
 
     json_format = """
     [
-        {'Summary':'Summary1', 'Who':'Portfolio Manager1', 'What': 'Implement Story1','Why': 'Business Reason', 'Acceptance_Criteria':['Must: AT1','Could: AT2','Could: AT3','Should: AT4'], 'Tasks':['role':'Business Analyst','task':'task1', 'role':'Business Analyst','task':'task5', 'role':'Developer','task':'task2', 'role':'Quality Assurance','task':'task2']}
-        {'Summary':'Summary2', 'Who':'Portfolio Manager2', 'What': 'Implement Story2','Why': 'Business Reason','Acceptance_Criteria':['Must: AT1','Must: AT2','Could: AT3','Should: AT4'], 'Tasks':['role':'Business Analyst','task':'task1', 'role':'Developer','task':'task2', 'role':'Developer','task':'task6', 'role':'Quality Assurance','task':'task2', 'role':'Quality Assurance','task':'task7']}
+        {'Summary':'Summary1', 'Who':'Portfolio Manager1', 'What': 'Implement Story1','Why': 'Business Reason', 'Acceptance_Criteria':['Must: AT1','Could: AT2','Could: AT3','Should: AT4'], 'Tasks':['role':'Business Analyst','task':'task1', 'role':'Developer','task':'task2', 'role':'Quality Assurance','task':'task2']}
+        {'Summary':'Summary2', 'Who':'Portfolio Manager2', 'What': 'Implement Story2','Why': 'Business Reason','Acceptance_Criteria':['Must: AT1','Must: AT2','Could: AT3','Should: AT4'], 'Tasks':['role':'Business Analyst','task':'task1', 'role':'Developer','task':'task2', 'role':'Quality Assurance','task':'task2']}
     ]
     """
     template = f"""
@@ -87,9 +88,10 @@ def get_generate_user_stories_prompt(user_input):
         In user_input, I would be providing you the Buiness Use Case. 
         Understand the context of use case and generate detailed level User Stories.
         Understand the User Story and generate tasks for Business Analyst, Developer and Quality Assurance roles for each User Story.
-        Output format must be json object as per Example Json format.
-        Example Json format: 
-        {json_format}
+        Make sure that output is json object format as per given output_json_format.
+         
+        output_json_format: {json_format}
+        
         Buiness Use Case:
         {user_input}
     """
@@ -197,6 +199,7 @@ def generate_tests_using_google(input, option):
 def generate_user_stories(input):
     prompt = get_generate_user_stories_prompt(input)
     output = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, [{"role":"user", "content": prompt}])
+    # print(output)
     return output
 
 def process_source_code(input, option, source_language, target_language):
