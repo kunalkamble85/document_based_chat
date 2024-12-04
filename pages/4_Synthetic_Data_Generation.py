@@ -838,7 +838,7 @@ if mode == "Portfolio Management Data Generation":
                             benchmarks_synthetic = synthetic_data["Benchmarks"]
                             benchmarks_synthetic = benchmarks_synthetic[benchmarks_synthetic['BENCHMARK_ID'].isin(list(dfs.keys()))]
                             # Generate only 10 BMs at a time
-                            benchmarks_synthetic = benchmarks_synthetic.head(10)
+                            # benchmarks_synthetic = benchmarks_synthetic.head(10)
                             bms_from_llm = fetch_bm_name_from_llm(len(benchmarks_synthetic))
                             print(f"len(benchmarks_synthetic):{len(benchmarks_synthetic)}")
                             print(f"len(bms_from_llm):{len(bms_from_llm)}")
