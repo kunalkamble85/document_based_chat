@@ -14,6 +14,7 @@ st.title("🤖 Welcome to Oracle Finergy LLM Demo")
 # "meta.llama3.1-405b"
 cloud_models = {"OCP":["meta.llama3.1-70b","cohore.command-r-plus","cohore.command-r-16k"],"GCP":['Gemini Pro'],"AWS":['Claude Sonnet'],"OpenAI":['gpt-4o-mini']}
 st.session_state.LLM_MODEL = "meta.llama3.1-70b"
+st.session_state.multi_model_synth = None
 userid = st.text_input("Enter your user id.")
 print(f"Loging sucussful:{userid}")
 # cloud_provider = st.radio(
@@ -40,7 +41,6 @@ if button:
         st.session_state.KUZU_DB_PATH = f"./kuzu_database/{userid}"
         print(st.session_state.KUZU_DB_PATH)
         st.session_state.LLM_MODEL = model_name
-        st.session_state.multi_model_synth = None
         st.success("Session created successfully, please click on application from left menu.")
     else:
         st.error("Please enter valid userid")
