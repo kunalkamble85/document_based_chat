@@ -226,17 +226,17 @@ def generate_synthetic_data(num_of_records):
     prompt = f"""
     You an Asset Manager, and you need to generate fake data which look like real data for benchamark names.
     Generate unique and distinctive benchmark names like S&P 500 Index and S&P 500 Growth Index. 
-    Generate {num_of_records+5} names like that and do not give any category to it.
-    Do not generate any commenty.
-	Return the benchmark names separtaed by pipe (|).
-	Always place the generated benchmark names into <bm_names></bm_names> tags."""
+    Generate {num_of_records+5} names like that and do not give any category to it, put result into <result></result> tags.
+    """
+	
     response = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, [{"role":"user", "content": prompt}])
-    bm_names = re.search(r"<bm_names>(.*?)</bm_names>", response, re.DOTALL)
+    bm_names = re.search(r"<result>(.*?)</result>", response, re.DOTALL)
     print(bm_names)
     if bm_names:
         bm_names =  bm_names.group(1)
-    benchmark_names = bm_names.split("|")
-    benchmark_names = [name.strip() for name in benchmark_names if name.strip()!=""]
+    
+    benchmark_names = bm_names.split("\n")
+    benchmark_names = [name.split('. ', 1)[-1].strip() for name in benchmark_names if name.strip()!="" and " unique" not in name and "benchmark names" not in name]
     return benchmark_names
 
 def insert_graph_entries(lines):
