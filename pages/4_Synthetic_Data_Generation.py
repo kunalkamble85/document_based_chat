@@ -280,6 +280,7 @@ def process_single_table_Scenario(df, scale, metadata_json=None):
         st.error(f"Error generating synthetic data: {e}")
         return None, None
 
+
 def process_multi_table_Scenario(dataframes, scale, metadata_json=None):
     try:
         metadata = detect_multi_table_metadata(dataframes)
@@ -295,24 +296,25 @@ def process_multi_table_Scenario(dataframes, scale, metadata_json=None):
         
         df_cleaned = drop_unknown_references(dataframes, metadata)
 
-        synthesizer = HMASynthesizer(metadata)
+        synthesizer = st.session_state.multi_model_synth
+        print(f"synthesizer:{synthesizer}")
+        if synthesizer is None:
+            synthesizer = HMASynthesizer(metadata)
+            constraints = []
+            for table_name, table_metadata in metadata.tables.items():
+                if hasattr(table_metadata, 'constraint_class') and hasattr(table_metadata, 'constraint_parameters'):
+                    my_constraint = {
+                        'constraint_class': table_metadata.constraint_class,
+                        'table_name': table_name,
+                        'constraint_parameters': table_metadata.constraint_parameters
+                    }
+                    constraints.append(my_constraint)
+            if constraints:
+                synthesizer.add_constraints(constraints=constraints)                
+            synthesizer.fit(df_cleaned)
+            st.session_state.multi_model_synth = synthesizer
 
-        constraints = []
-        for table_name, table_metadata in metadata.tables.items():
-            if hasattr(table_metadata, 'constraint_class') and hasattr(table_metadata, 'constraint_parameters'):
-                my_constraint = {
-                    'constraint_class': table_metadata.constraint_class,
-                    'table_name': table_name,
-                    'constraint_parameters': table_metadata.constraint_parameters
-                }
-                constraints.append(my_constraint)
-
-        if constraints:
-            synthesizer.add_constraints(constraints=constraints)
-            
-        synthesizer.fit(df_cleaned)
-        synthetic_data = synthesizer.sample(scale)
-        
+        synthetic_data = synthesizer.sample(scale)        
         dataframes_out = {table_name: synthetic_data[table_name] for table_name in metadata.tables.keys()}
         
         return metadata, dataframes_out
@@ -343,10 +345,8 @@ def convert_df(df):
 
 def fetch_bm_name_from_llm(num_of_records):
     try:
-        generated_text = generate_synthetic_data(num_of_records)
-        print(generated_text)
-        benchmark_names = generated_text.split("\n")
-        benchmark_names = [name.split('. ', 1)[-1].strip() for name in benchmark_names if name.strip()!="" and "20 unique" not in name]
+        benchmark_names = generate_synthetic_data(num_of_records)
+        print(f"benchmark_names:{benchmark_names}")
         return benchmark_names[:num_of_records]
     except Exception as e:
         st.error(f"Error fetching BM_NAME from LLM: {e}")
@@ -837,7 +837,15 @@ if mode == "Portfolio Management Data Generation":
                             
                             benchmarks_synthetic = synthetic_data["Benchmarks"]
                             benchmarks_synthetic = benchmarks_synthetic[benchmarks_synthetic['BENCHMARK_ID'].isin(list(dfs.keys()))]
-                            benchmarks_synthetic['BM_NAME'] = fetch_bm_name_from_llm(len(benchmarks_synthetic))
+                            # Generate only 10 BMs at a time
+                            benchmarks_synthetic = benchmarks_synthetic.head(10)
+                            bms_from_llm = fetch_bm_name_from_llm(len(benchmarks_synthetic))
+                            print(f"len(benchmarks_synthetic):{len(benchmarks_synthetic)}")
+                            print(f"len(bms_from_llm):{len(bms_from_llm)}")
+                            if len(benchmarks_synthetic) > len(bms_from_llm):
+                                benchmarks_synthetic = benchmarks_synthetic.head(len(bms_from_llm))
+
+                            benchmarks_synthetic['BM_NAME'] = bms_from_llm
                             benchmarks_synthetic = benchmarks_synthetic.explode('BM_NAME')
                             benchmarks_synthetic['BM_NAME'] = benchmarks_synthetic['BM_NAME'].apply(clean_bm_name)
                             benchmarks_synthetic['BM_NAME'].replace('', 'Unnamed Benchmark', inplace=True)
@@ -846,23 +854,23 @@ if mode == "Portfolio Management Data Generation":
                             # Display and download Benchmarks synthetic data
                             st.write("Synthetic Benchmarks Data:")
                             st.dataframe(benchmarks_synthetic, hide_index=True)
-                            benchmarks_csv = convert_df(benchmarks_synthetic)
-                            st.download_button(
-                                label="Download Benchmarks Synthetic Data CSV",
-                                data=benchmarks_csv,
-                                file_name="benchmarks_synthetic_data.csv",
-                                mime="text/csv"
-                            )
+                            # benchmarks_csv = convert_df(benchmarks_synthetic)
+                            # st.download_button(
+                            #     label="Download Benchmarks Synthetic Data CSV",
+                            #     data=benchmarks_csv,
+                            #     file_name="benchmarks_synthetic_data.csv",
+                            #     mime="text/csv"
+                            # )
                             # Display and download Benchmark Constituent synthetic data
                             st.write("Synthetic Benchmark Constituent Data:")
                             st.dataframe(benchmark_constituent_synthetic, hide_index=True)
-                            constituent_csv = convert_df(benchmark_constituent_synthetic)
-                            st.download_button(
-                                label="Download Benchmark Constituent Synthetic Data CSV",
-                                data=constituent_csv,
-                                file_name="benchmark_constituent_synthetic_data.csv",
-                                mime="text/csv"
-                            )
+                            # constituent_csv = convert_df(benchmark_constituent_synthetic)
+                            # st.download_button(
+                            #     label="Download Benchmark Constituent Synthetic Data CSV",
+                            #     data=constituent_csv,
+                            #     file_name="benchmark_constituent_synthetic_data.csv",
+                            #     mime="text/csv"
+                            # )
 
                             sec_ids = benchmark_constituent_synthetic["SECURITY_ID"].unique()
                             # Display and download Securities synthetic data
@@ -870,13 +878,13 @@ if mode == "Portfolio Management Data Generation":
                             securities_synthetic = synthetic_data["Securities"]
                             securities_synthetic = securities_synthetic[securities_synthetic['SECURITY_ID'].isin(sec_ids)]
                             st.dataframe(securities_synthetic, hide_index=True)
-                            securities_csv = convert_df(securities_synthetic)
-                            st.download_button(
-                                label="Download Securities Synthetic Data CSV",
-                                data=securities_csv,
-                                file_name="securities_synthetic_data.csv",
-                                mime="text/csv"
-                            )
+                            # securities_csv = convert_df(securities_synthetic)
+                            # st.download_button(
+                            #     label="Download Securities Synthetic Data CSV",
+                            #     data=securities_csv,
+                            #     file_name="securities_synthetic_data.csv",
+                            #     mime="text/csv"
+                            # )
                             # Download Metadata JSON
                             if metadata:
                                 metadata_json = metadata_to_json(metadata)

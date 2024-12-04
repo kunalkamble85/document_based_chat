@@ -40,6 +40,7 @@ if button:
         st.session_state.KUZU_DB_PATH = f"./kuzu_database/{userid}"
         print(st.session_state.KUZU_DB_PATH)
         st.session_state.LLM_MODEL = model_name
+        st.session_state.multi_model_synth = None
         st.success("Session created successfully, please click on application from left menu.")
     else:
         st.error("Please enter valid userid")

@@ -226,9 +226,18 @@ def generate_synthetic_data(num_of_records):
     prompt = f"""
     You an Asset Manager, and you need to generate fake data which look like real data for benchamark names.
     Generate unique and distinctive benchmark names like S&P 500 Index and S&P 500 Growth Index. 
-    Generate {num_of_records+5} names like that and do not give any category to it"""
+    Generate {num_of_records+5} names like that and do not give any category to it.
+    Do not generate any commenty.
+	Return the benchmark names separtaed by pipe (|).
+	Always place the generated benchmark names into <bm_names></bm_names> tags."""
     response = generate_oci_gen_ai_response(st.session_state.LLM_MODEL, [{"role":"user", "content": prompt}])
-    return response
+    bm_names = re.search(r"<bm_names>(.*?)</bm_names>", response, re.DOTALL)
+    print(bm_names)
+    if bm_names:
+        bm_names =  bm_names.group(1)
+    benchmark_names = bm_names.split("|")
+    benchmark_names = [name.strip() for name in benchmark_names if name.strip()!=""]
+    return benchmark_names
 
 def insert_graph_entries(lines):
     conn = kuzu.Connection(st.session_state.kuzu_database)
