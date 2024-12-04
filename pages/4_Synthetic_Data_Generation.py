@@ -9,6 +9,7 @@ from sdv.multi_table import HMASynthesizer
 from sdv.metadata import SingleTableMetadata, MultiTableMetadata
 from sdv.utils import drop_unknown_references
 from utils.langchain_utils import generate_synthetic_data, display_sidebar
+import traceback
 
 # Set up Google Gemini Pro API key and model
 st.set_page_config(page_title="Synthetic Data Generation", page_icon=":book:", layout="wide")
@@ -333,7 +334,7 @@ def normalize_weights(df, weight_column='WEIGHT(%)'):
     # Adjust for any floating-point errors to ensure the sum is strictly 1
     difference = 1 - df[weight_column].sum()
     df[weight_column].iloc[-1] += difference  # Adjust the last value to correct any deviation
-    
+    df[weight_column] = df[weight_column] * 100
     return df    
 
 
@@ -791,7 +792,6 @@ if mode == "Portfolio Management Data Generation":
                                         mime="application/json"
                                     )
         except Exception as e:
-            import traceback
             print(traceback.format_exc())
             st.error(f"Error reading or applying metadata file {metadata_file_path}: {e}")
 
@@ -826,13 +826,32 @@ if mode == "Portfolio Management Data Generation":
                             "Securities": securities_df,
                             "Benchmarks": benchmarks_df
                         }, scale, metadata_json)
-                        if synthetic_data is not None:
+                        if synthetic_data is not None:         
                             benchmark_constituent_synthetic = synthetic_data["Benchmark_Constituent"]
-                            securities_synthetic = synthetic_data["Securities"]
+                            dfs = {id_val: sub_df for id_val, sub_df in benchmark_constituent_synthetic.groupby('BENCHMARK_ID')}
+                            for id_val, sub_df in dfs.items():
+                                sub_df = normalize_weights(sub_df, weight_column='WEIGHT(%)')
+                                dfs[id_val] = sub_df
+                            benchmark_constituent_synthetic = pd.concat(dfs.values(), ignore_index=True)
+                                           
+                            
                             benchmarks_synthetic = synthetic_data["Benchmarks"]
-                            # Normalize the WEIGHT(%) column in the synthetic Benchmark Constituent data
-                            benchmark_constituent_synthetic = normalize_weights(
-                                benchmark_constituent_synthetic, weight_column='WEIGHT(%)'
+                            benchmarks_synthetic = benchmarks_synthetic[benchmarks_synthetic['BENCHMARK_ID'].isin(list(dfs.keys()))]
+                            benchmarks_synthetic['BM_NAME'] = fetch_bm_name_from_llm(len(benchmarks_synthetic))
+                            benchmarks_synthetic = benchmarks_synthetic.explode('BM_NAME')
+                            benchmarks_synthetic['BM_NAME'] = benchmarks_synthetic['BM_NAME'].apply(clean_bm_name)
+                            benchmarks_synthetic['BM_NAME'].replace('', 'Unnamed Benchmark', inplace=True)
+                            # Normalize the WEIGHT(%) column in the synthetic Benchmark Constituent data for each BM ID
+
+                            # Display and download Benchmarks synthetic data
+                            st.write("Synthetic Benchmarks Data:")
+                            st.dataframe(benchmarks_synthetic, hide_index=True)
+                            benchmarks_csv = convert_df(benchmarks_synthetic)
+                            st.download_button(
+                                label="Download Benchmarks Synthetic Data CSV",
+                                data=benchmarks_csv,
+                                file_name="benchmarks_synthetic_data.csv",
+                                mime="text/csv"
                             )
                             # Display and download Benchmark Constituent synthetic data
                             st.write("Synthetic Benchmark Constituent Data:")
@@ -844,24 +863,18 @@ if mode == "Portfolio Management Data Generation":
                                 file_name="benchmark_constituent_synthetic_data.csv",
                                 mime="text/csv"
                             )
+
+                            sec_ids = benchmark_constituent_synthetic["SECURITY_ID"].unique()
                             # Display and download Securities synthetic data
                             st.write("Synthetic Securities Data:")
+                            securities_synthetic = synthetic_data["Securities"]
+                            securities_synthetic = securities_synthetic[securities_synthetic['SECURITY_ID'].isin(sec_ids)]
                             st.dataframe(securities_synthetic, hide_index=True)
                             securities_csv = convert_df(securities_synthetic)
                             st.download_button(
                                 label="Download Securities Synthetic Data CSV",
                                 data=securities_csv,
                                 file_name="securities_synthetic_data.csv",
-                                mime="text/csv"
-                            )
-                            # Display and download Benchmarks synthetic data
-                            st.write("Synthetic Benchmarks Data:")
-                            st.dataframe(benchmarks_synthetic, hide_index=True)
-                            benchmarks_csv = convert_df(benchmarks_synthetic)
-                            st.download_button(
-                                label="Download Benchmarks Synthetic Data CSV",
-                                data=benchmarks_csv,
-                                file_name="benchmarks_synthetic_data.csv",
                                 mime="text/csv"
                             )
                             # Download Metadata JSON
@@ -874,6 +887,7 @@ if mode == "Portfolio Management Data Generation":
                                     mime="application/json"
                                 )
         except Exception as e:
+            print(traceback.format_exc())
             st.error(f"Error reading or applying metadata file {metadata_file_path}: {e}")
     else:
         if selected_scenario:

@@ -10,7 +10,7 @@
             "regex_format": "[A-Z]{5,7}$"
         },
         "SECURITY_NAME": {
-            "sdtype": "categorical"
+            "sdtype": "company"
         },
         "SECTOR": {
             "sdtype": "categorical"
@@ -38,6 +38,6 @@
     },
     "constraint_class": "FixedCombinations",
     "constraint_parameters": {
-        "column_names": ["SECTOR", "INDUSTRY","SECURITY_NAME"]
+        "column_names": ["SECTOR", "INDUSTRY"]
     }
 }
