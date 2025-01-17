@@ -1,1 +1,1 @@
-# LLamaindex projects
+# AI Use Cases
