@@ -1,0 +1,6 @@
+[DEFAULT]
+user=ocid1.user.oc1..aaaaaaaab5x6qo47ipkpqpzvqrgiv5jfciyjkflnl5ny464yhkhzoxjf4dpq
+fingerprint=f3:c2:b6:60:77:0a:3b:5a:fb:70:65:c7:90:34:89:d3
+tenancy=ocid1.tenancy.oc1..aaaaaaaaigt4utajpqlcw7ofsuz6m33bufl3nrem3kk6mhryzozdcyjfvtma
+region=uk-london-1
+key_file=./config/oci_key.pem
