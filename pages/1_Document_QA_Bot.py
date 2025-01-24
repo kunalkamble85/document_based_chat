@@ -32,6 +32,13 @@ def get_prompt_template(question, context):
     Give answer or summary to the questions solely from only provided Text.
     Do not give any general answers apart from Text provided.
     if you can't find the answer in the provided Text just say 'I don't know'. 
+    """
+    if "qa_document_context" in st.session_state:
+        prompt_template = f"""{prompt_template}
+    Below is business context about document provided.
+    {st.session_state["qa_document_context"]}
+    """
+    prompt_template = f"""{prompt_template}
     \nText:{context}\n Question:\{question}
     """
     return prompt_template
@@ -73,6 +80,7 @@ def user_input(user_question, files):
     docs = search_text_fs(user_question, files)
     if len(docs)>0:
         prompt = get_prompt_template(user_question, docs)
+        print(prompt)
         chat_history = st.session_state["chat_history"]
         messages = chat_history[:-1]
         messages.append({"role":"user", "content": prompt})
@@ -93,6 +101,7 @@ if "vector_store" not in st.session_state:
     st.session_state.vector_store = None
 if "documents_processed" not in st.session_state:
     st.session_state.documents_processed = False
+
 
 def check_file_exists_fs(filename_check):
     try:
@@ -215,7 +224,7 @@ if task == "Upload File":
                         except Exception as e:
                             print(e)
                             st.error(f"Error while loading file {file_name}.")
-if task == "Delete File":
+elif task == "Delete File":
     fileslist = get_all_filenames_from_vector_store()
     if len(fileslist):
         default = fileslist[0]
@@ -242,6 +251,15 @@ else:
         default = None
     files = st.multiselect("Choose File for Q&A", options=fileslist, label_visibility="hidden", placeholder="Choose File for Q&A", default=default)
     num_results = st.slider(label="Select chunk limit", min_value=5, max_value=20, value=10, step=5)
+
+    qa_document_context = st.text_area(label="Additional Document Context", value="", height= 200)
+    if qa_document_context:
+        st.session_state["qa_document_context"] = qa_document_context
+    clear_context = st.button("Clear Context")
+    if clear_context:
+        if "qa_document_context" in st.session_state:
+            del st.session_state["qa_document_context"]
+
     if files:
         for message in st.session_state["doc_messages"]:
             # with st.chat_message(message["role"]):
