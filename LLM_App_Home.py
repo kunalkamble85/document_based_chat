@@ -1,10 +1,5 @@
 # from dotenv import load_dotenv
 # load_dotenv()
-
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
 import streamlit as st
 from utils.langchain_utils import display_sidebar
 
@@ -12,7 +7,7 @@ st.set_page_config(page_title="🤖 LLM Home", page_icon=":book:", layout="wide"
 display_sidebar()
 st.title("🤖 Welcome to Oracle Finergy LLM Demo")
 # "meta.llama3.1-405b"
-cloud_models = {"OCP":["meta.llama3.1-70b","cohore.command-r-plus","cohore.command-r-16k"],"GCP":['Gemini Pro'],"AWS":['Claude Sonnet'],"OpenAI":['gpt-4o-mini']}
+cloud_models = {"OCP":["meta.llama3.1-70b","cohere.command-r-plus","cohere.command-r-16k"],"GCP":['Gemini Pro'],"AWS":['Claude Sonnet'],"OpenAI":['gpt-4o-mini']}
 st.session_state.LLM_MODEL = "meta.llama3.1-70b"
 st.session_state.multi_model_synth = None
 userid = st.text_input("Enter your user id.")
