@@ -8,7 +8,7 @@ config = oci.config.from_file('./config/config', CONFIG_PROFILE)
 # Service endpoint
 endpoint = "https://inference.generativeai.uk-london-1.oci.oraclecloud.com"
 model_endpoint_map = {"meta.llama3.1-70b":"ocid1.generativeaimodel.oc1.uk-london-1.amaaaaaask7dceyarp4fbl4nicr66ibhaqqxg5w77nnzlgmof5hinslboika",
-                      "meta.llama3-70b":"ocid1.generativeaimodel.oc1.uk-london-1.amaaaaaask7dceyaplxvoaiprdoltkphy3fg3ml2xxgt3mwrdptolv5fs5rq",
+                      "meta.llama3.3-70b":"ocid1.generativeaimodel.oc1.uk-london-1.amaaaaaask7dceyach2dyu6g5w5ocnvbkto2g76wxitj3rpddplsqoxqh2lq",
                       "meta.llama3.1-405b": "ocid1.generativeaiendpoint.oc1.uk-london-1.amaaaaaah7afz4ia4s7lwl5qt7bmupjqknwyvwbfpi7id3onks5rdaga2v5a",
                       "cohere.command-r-plus":"ocid1.generativeaimodel.oc1.uk-london-1.amaaaaaask7dceya5umoptfnq5yg7w2l5lte3fjpism64ismzmyehfcdh5cq",
                       "cohere.command-r":"ocid1.generativeaimodel.oc1.uk-london-1.amaaaaaask7dceyahpidcahiiyhcdmnvicfxo7suq3pxcimkyik75mbxziqq"}

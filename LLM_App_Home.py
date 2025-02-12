@@ -2,13 +2,14 @@
 # load_dotenv()
 import streamlit as st
 from utils.langchain_utils import display_sidebar
+from utils.oci_utils import generate_oci_gen_ai_response
 
 st.set_page_config(page_title="🤖 LLM Home", page_icon=":book:", layout="wide")
 display_sidebar()
 st.title("🤖 Welcome to Oracle Finergy LLM Demo")
 # "meta.llama3.1-405b"
-cloud_models = {"OCP":["meta.llama3.1-70b","cohere.command-r-plus","cohere.command-r"],"GCP":['Gemini Pro'],"AWS":['Claude Sonnet'],"OpenAI":['gpt-4o-mini']}
-st.session_state.LLM_MODEL = "meta.llama3.1-70b"
+cloud_models = {"OCP":["meta.llama3.3-70b","meta.llama3.1-70b","meta.llama3.1-405b","cohere.command-r-plus","cohere.command-r"],"GCP":['Gemini Pro'],"AWS":['Claude Sonnet'],"OpenAI":['gpt-4o-mini']}
+st.session_state.LLM_MODEL = "meta.llama3.3-70b"
 st.session_state.multi_model_synth = None
 userid = st.text_input("Enter your user id.")
 print(f"Loging sucussful:{userid}")
@@ -36,6 +37,13 @@ if button:
         st.session_state.KUZU_DB_PATH = f"./kuzu_database/{userid}"
         print(st.session_state.KUZU_DB_PATH)
         st.session_state.LLM_MODEL = model_name
-        st.success("Session created successfully, please click on application from left menu.")
+        try:
+            response = generate_oci_gen_ai_response(model_name, [{"role":"user", "content":"Hello"}])
+            print(f"Response from model: {response}")
+            st.success("Session created successfully, please click on application from left menu.")
+        except Exception as e:
+            print(e)
+            st.error("Error in intializing model, please try again with different model.")
+
     else:
         st.error("Please enter valid userid")
